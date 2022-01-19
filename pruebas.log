@@ -1,0 +1,22 @@
+Ca/Si ratio:     2.030303 
+SiOH/Si ratio:  0.181818 
+CaOH/Ca ratio:  0.0 
+MCL:            0.0 
+ 
+Shape:   1   1   1
+ 
+Supecell Brick Code: 
+ Na  Nb  Nc  :   Brick Code 
+             :   Water Code 
+  0   0   0  :   ['<L', "SU", '<R', '>L', "SD", '>R'] 
+             :   [] 
+
+Charge Distribution: 
+  0   0   0  :   -2 
+  0   0   1  :   1 
+  0   1   0  :   -1 
+  0   1   1  :   -1 
+  1   0   0  :   1 
+  1   0   1  :   0 
+  1   1   0  :   2 
+  1   1   1  :   0 

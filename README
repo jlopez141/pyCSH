@@ -1,0 +1,117 @@
+
+
+1. parameters.py
+----------------
+Contains the parameters for the simulations:
+	+ seed:  seed for the random number generator.
+	+ shape: shape of the supercell
+	+ Ca_Si_ratio:
+	+ W_Si_ratio :
+	+ N_samples  : 
+
+	+ create     : if True generates N_samples samples 
+	+ check      : if True checks the CaOH/Ca, SiOH/Si and MCL comparing them to the experimetal data (The pdf files I sent) 
+
+	+ read_from_file : if True reads a user defined brick code and generates the lammps input for it. The input file for reading is like the ".log" that the code generates (for now the empty lines have to be respected)
+
+
+
+2. mod_construct_brick.py
+-------------------------
+Creates all the possible bricks.
+
+	+ Piece (class): 
+		is a class that contains all the information of a pieces (Block): number of atoms, species, coordinates, etc.
+	+ pieces (dictionary) :
+		dictionary with all the pieces. Each entry of the dictionary contains an object of the class "Piece".
+
+	+ Brick (class): 
+		a class containing all the information of a brick. Also contains a list of elegible_water for that brick. Here I also count some variables needed for computing SiOH/Si, CaOH/Ca, MCL etc.
+
+	+ above_layer()/below_layer(): 
+		Make all possible combinations for making the upper or lower chains. Here I also add the OH groups that may be bonded to the Ca atoms in the chains.
+
+	+ interlayer(): 
+		Make all possible combinations for the interlayer.
+
+	+ check_restrictions(): 
+		Remove the combinations (bricks) that have incompatible bridgings and OH: oMDR is incompatible with SD and SDo etc.
+
+	+ get_all_bricks(): 
+		create all possible bricks. The bricks are stored in a nested dictionary sorted by its Ca/Si ratio, Q, SiOH/Si ratio and CaOH/Ca ratio. For example 
+							sorted_bricks[Ca_Si=1.5][Q=1][SiOH=0.25][CaOH=0.3333]
+		contains a list with the bricks with those specific ratios. This is used later for sampling supercells with specific ratios.
+
+
+	+ read_brick(): 
+		reads a ".log" file and returns the supercell (named "crystal" in the code) defined by the user.
+
+
+
+3.mod_sample.py
+--------------
+Create a supercell (crystal) with a given Ca/Si and water/Si ratio.
+
+	+ Sample_Ca_Si_ratio(): 
+		We use 4 gaussian distributions to select a brick from the dictionary of bricks created in "get_all_bricks()": 
+			-The first gaussian is centered around the desired Ca/Si ratio.
+			-The second around the charge Q=0 so that the system is neutral.
+			-The third around the experimental SiOH/Si ratio for the desired Ca/Si ratio.
+			-The fourth around the experimental SiOH/Si ratio for the desired Ca/Si ratio.
+		Once we sampled the amount of bricks needed for the supercell, we check if the whole supercell is neutral and whether it can contain all the water that the user has requested. If it can't, another supercell is constructed from scratch.
+		Returns a list of brick type of objects.
+
+	+ fill_water(): 
+		randomly introduces water in a crystal. Returns a list of water for each of the bricks.
+
+
+
+4. mod_construct_supercell.py
+-----------------------------
+Gets all the coordinates, bonds, angles, etc. for the atoms in the supercell. This is the most messy file.
+
+	+ reshape_crystal():  
+		takes the list of bricks and water generated in previous step and reshape them with the shape of the supercell. The output is a tensor of dimensions shape=( Na, Nb, Nc ).
+
+	+ get_coordinates_brick():
+		Given a brick code (e.g. ["<L", "<R", ">L", ">R"]) and a cell vector correspoding to the position of the brick in the supercell computes the positions of the atoms and the bonds.
+		If the brick contains an "Oh", we add the Oh, and the corresponding bond.
+		If the brick contains an "O", we add the shell "O".
+
+		This information is stored in a dictionary brick_dict, where the information for each piece in the brick is stored. For example:
+
+				brick_dict["<Lo"]
+
+		contains the coordinates and species of all the atoms in that brick. This information is stored in lists of the kind: [ atom_index, atom_specie, charge, x, y, z ]
+
+
+		Then we add the coordinates of the water molecules, adding the "Hw" hydrogens and the bonds. The information is stored in a similar dictionary named water_dict.
+
+
+	+ get_full_coordinates():
+		Computes the coordinates and bonds for all the bricks in the supercell using the previous function. The information is stored in a dictionary made of the dictionaries created in that function. For example:
+
+					crystal_dict[(i,j,k)] 
+
+		contains the brick_dict corresponding to the (i,j,k) cell of the supercell.
+		This information is needed to compute the angles, since we need to track the relative positions of the bricks along the "b" direction.
+
+	+ get_angles():
+		Uses the "crystal_dict" dictionary to compute the list of angles. This is the most hard function to read/understand. Here I just hard-code all the bonds for each type of piece.
+
+			- First we make a list of the indexes of the oxygen atoms bonded to the central Si. In the cases where it is needed, we get the oxygens from the adjacent bricks.
+			- Then we do all the possible O-Si-O angles and add the to a list.
+
+		The same is done for the water molecules in "water_dict".
+
+
+
+5. mod_write.py
+---------------
+This just contains some functions to write the output of the code. It gives the output in the lammps ".data" files, ready to run, in ".vasp" format (easier to directly visualize in vesta), and the ".log" containg all the codes of the brick.
+
+
+
+6. main_brick.py
+----------------
+The main program where all the previously defined functions are used.
