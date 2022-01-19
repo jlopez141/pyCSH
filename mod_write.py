@@ -360,7 +360,6 @@ def get_sorted_log(list_properties):
 		fmt = "Sample: {: 5d}     Ca/Si: {: 8.6f}     SiOH/Si: {: 8.6f}    CaOH/Ca: {: 8.6f}    MCL: {: 8.6f} \n"
 
 		sorted_Ca_Si = sorted(sorted_properties.keys())
-		print(sorted_Ca_Si)
 		for Ca_Si in sorted_Ca_Si:
 			sorted_SiOH = sorted(sorted_properties[Ca_Si].keys())
 			for SiOH in sorted_SiOH:
