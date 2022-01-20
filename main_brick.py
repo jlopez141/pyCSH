@@ -7,6 +7,10 @@ from parameters import *
 from mod_make_graphs import *
 import os
 
+# Check input parameters:
+glob = blobals()
+if seed not in glob:
+	seed = 1123
 
 
 np.random.seed(seed)
