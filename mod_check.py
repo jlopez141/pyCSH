@@ -3,33 +3,21 @@ from mod_sample import *
 
 
 
-# def get_offsets(Ca_Si_center, sorted_bricks, shape):
+def get_offset(N_samples, sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths):
+	aux_SiOH = np.zeros(N_samples)
+	aux_CaOH = np.zeros(N_samples)
+	aux_MCL = np.zeros(N_samples)
+	for isample in range(N_samples):
+		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL,_,_ = sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths )
 
-# 	N_samples = 100
+		aux_SiOH[isample] = r_SiOH
+		aux_CaOH[isample] = r_CaOH
+		aux_MCL[isample]  = MCL
 
-# 	list_ratios = np.linspace(Ca_Si_center-0.1, Ca_Si_center+0.1, )
-# 	offset_SiOH = {}
-# 	offset_CaOH = {}
-
-# 	for Ca_Si_ratio in list_ratios:
-# 		aux_SiOH = np.zeros(N_samples)
-# 		aux_CaOH = np.zeros(N_samples)
-# 		aux_MCL = np.zeros(N_samples)
-# 		for isample in range(N_samples):
-# 			crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL = sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick )
-
-# 			aux_SiOH[isample] = r_SiOH
-# 			aux_CaOH[isample] = r_CaOH
-# 			aux_MCL[isample]  = MCL
-
-# 		print( Ca_Si_ratio, np.mean(aux_SiOH), np.mean(aux_CaOH), np.mean(aux_MCL) )
-# 		offset_SiOH.append( exp_SiOH(Ca_Si_ratio)-np.mean(aux_SiOH) )
-# 		offset_CaOH.append( exp_CaOH(Ca_Si_ratio)-np.mean(aux_CaOH) )
-
-# 		list_MCL.append( [np.mean(aux_MCL), np.std(aux_MCL)] )
+	return exp_SiOH(Ca_Si_ratio)-np.mean(aux_SiOH), exp_CaOH(Ca_Si_ratio)-np.mean(aux_CaOH)
 
 
-def check_SiOH_CaOH_MCL(sorted_bricks, shape):
+def check_SiOH_CaOH_MCL(sorted_bricks, widths, shape):
 
 	compute_offset = True
 
@@ -46,21 +34,10 @@ def check_SiOH_CaOH_MCL(sorted_bricks, shape):
 	if compute_offset:
 
 		for Ca_Si_ratio in list_target_ratios:
-			aux_SiOH = np.zeros(N_samples)
-			aux_CaOH = np.zeros(N_samples)
-			aux_MCL = np.zeros(N_samples)
-			for isample in range(N_samples):
-				crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL = sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick )
-
-				aux_SiOH[isample] = r_SiOH
-				aux_CaOH[isample] = r_CaOH
-				aux_MCL[isample]  = MCL
-
-			#print( Ca_Si_ratio, np.mean(aux_SiOH), np.mean(aux_CaOH), np.mean(aux_MCL) )
-			offset_SiOH.append( exp_SiOH(Ca_Si_ratio)-np.mean(aux_SiOH) )
-			offset_CaOH.append( exp_CaOH(Ca_Si_ratio)-np.mean(aux_CaOH) )
-
-			list_MCL.append( [np.mean(aux_MCL), np.std(aux_MCL)] )
+			off_Si, off_Ca = get_offset(N_samples, sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths)
+			
+			offset_SiOH.append(off_Si)
+			offset_CaOH.append(off_Ca)
 
 	else:
 		offset_SiOH = [0.0 for i in range(len(list_target_ratios))]
@@ -82,7 +59,7 @@ def check_SiOH_CaOH_MCL(sorted_bricks, shape):
 		aux_MCL = np.zeros(N_samples)
 		for isample in range(N_samples):
 			offset = [offset_SiOH[ind], offset_CaOH[ind]]
-			crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL = sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, offset )
+			crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL,_,_ = sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, offset=offset )
 
 			aux_CaSi[isample] = N_Ca/N_Si
 			aux_SiOH[isample] = r_SiOH

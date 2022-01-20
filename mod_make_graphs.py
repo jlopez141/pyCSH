@@ -8,7 +8,8 @@ def exp_SiOH(Ca_Si):
 def exp_CaOH(Ca_Si):
 	return -0.6 + 0.65*Ca_Si
 
-
+def exp_MCL(Ca_Si):
+	return 1.8*Ca_Si/(Ca_Si-0.69)
 
 
 def plot_XOH_X(list_properties):
@@ -47,6 +48,41 @@ def plot_XOH_X(list_properties):
 	plt.tight_layout()
 	#plt.show()
 	plt.savefig( "XOX_X.pdf" )
+	plt.clf()
+
+
+def plot_MCL(list_properties):
+
+	transp = 0.5
+	lw = 2
+	colors = [ "#360568", 
+		   "#4281A4", 
+		   "#7FC29B", 
+		   "#DBAD6A", 
+		   "#A4243B", 
+		   "#898989",
+		   "#7D387D",
+		   "#78290F" ]
+
+	x_Ca_Si = np.linspace(0.8, 2.2,500)
+	y_MCL  = exp_MCL(x_Ca_Si)
+
+	plt.plot( x_Ca_Si, y_MCL, "--", color=colors[0], alpha=1, label="MCL (exp)", lw=lw )
+
+	plt.scatter( list_properties[:,0], list_properties[:,3], color=colors[1], alpha=transp, label="MCL (pYCSH)" )
+
+
+	plt.xlabel('Ca/Si', fontsize=14)
+	plt.ylabel('MCL', fontsize=14)
+	plt.legend()
+
+	plt.xlim((0.8, 2.2))
+
+	plt.tick_params(labelsize=12)
+
+	plt.tight_layout()
+	#plt.show()
+	plt.savefig( "MCL.pdf" )
 	plt.clf()
 
 
@@ -206,7 +242,7 @@ def plot_experimental():
 	list_MCL = np.array(list_MCL)
 
 
-	x_Ca_Si = np.linspace(0.7, 2.2,100)
+	x_Ca_Si = np.linspace(0.8, 2.2,100)
 	y_CaOH  = exp_CaOH(x_Ca_Si)
 	y_SiOH  = exp_SiOH(x_Ca_Si)
 
@@ -239,11 +275,12 @@ def plot_experimental():
 
 
 	plt.scatter( point_MCL[:,0], point_MCL[:,1], color=colors[0], alpha=transp, label="MCL (exp)" )
+	plt.plot( x_Ca_Si, exp_MCL(x_Ca_Si), "--", color=colors[0], alpha=transp, lw=lw )
 	plt.errorbar(list_CaSi[:,0], list_MCL[:,0], xerr=list_CaSi[:,1], yerr=list_MCL[:,1],
 				 capsize=4, fmt=".", color=colors[2], alpha=transp, label="MCL (pyCSH)")
 	plt.ylabel( "MCL" )
 
-	#plt.xlim((0.8, 2.1))
+	plt.xlim((0.8, 2.2))
 	plt.ylabel( "MCL", fontsize=12 )
 	plt.xlabel( "Si/Ca", fontsize=12 )
 
@@ -251,4 +288,41 @@ def plot_experimental():
 
 	plt.tight_layout()
 	plt.savefig( "test_MCL.pdf" )
+	plt.clf()
 
+
+
+def plot_water(list_properties):
+
+
+	transp = 1.0
+	lw = 2
+	colors = [ "#360568", 
+	   "#4281A4", 
+	   "#7FC29B", 
+	   "#DBAD6A", 
+	   "#A4243B", 
+	   "#898989",
+	   "#7D387D",
+	   "#78290F" ]
+
+
+	point_Ca_Si  = np.array([1.85,1.77,1.56,1.39,1.06,0.97,1.7,1.54,1.45,1.32,1.19, 1.13, 0.88, 0.79,0.41])
+	point_r_H_Si = np.array([2.072,2.071,1.747,1.4595,0.9964,0.8924,1.462,1.4322,1.2035,1.0164,0.9401,0.8701,0.7128,0.6873,0.4674])
+
+
+	plt.scatter( point_Ca_Si, point_r_H_Si, color=colors[0], alpha=transp, label="H/Si (exp)" )
+	plt.scatter( list_properties[:,0], list_properties[:,5], color=colors[1], alpha=transp, label="H/Si (pYCSH)" )
+
+
+	plt.xlabel( "Si/Ca", fontsize=12 )
+	plt.ylabel( "H/Si", fontsize=12 )
+
+
+	plt.xlim((0.8, 2.1))
+
+	plt.legend(loc="upper right", fontsize=12)
+
+	plt.tight_layout()
+	plt.savefig( "water.pdf" )
+	plt.clf()

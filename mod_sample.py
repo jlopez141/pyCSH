@@ -1,11 +1,12 @@
 import numpy as np
 
 
-def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, offset=[0.0,0.0]):
+def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, offset=[0.0,0.0]):
 	
-	width_Ca_Si = 0.1
-	width_SiOH = 0.08
-	width_CaOH = 0.04
+
+	width_Ca_Si = widths[0]
+	width_SiOH = widths[1]
+	width_CaOH = widths[2]
 
 	keys_Ca_Si = np.array(list(sorted_bricks.keys()))
 
@@ -72,9 +73,10 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, offset=[
 				brick_Q += keys_Q[ind_Q]
 
 
-		if brick_Q == 0:# and check_SiOH(N_SiOH, N_Oh, N_Si, N_Ca):
+		if brick_Q == 0:
 			list_elegible_water = np.array([ len(crystal[i_brick].elegible_water) for i_brick in range(N_brick) ])
 			N_water = int(np.rint(N_Si * W_Si_ratio))
+			r_H_Si = N_Oh/N_Si + 2*W_Si_ratio
 
 			if np.sum(list_elegible_water) >= N_water:
 				break
@@ -107,7 +109,7 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, offset=[
 	else:
 		MCL = 0
 
-	return crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL
+	return crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_H_Si
 
 
 

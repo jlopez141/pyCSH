@@ -8,9 +8,23 @@ from mod_make_graphs import *
 import os
 
 # Check input parameters:
-glob = blobals()
-if seed not in glob:
-	seed = 1123
+try: seed
+except NameError: seed = 1123
+
+try: width_Ca_Si
+except NameError: width_Ca_Si = 0.1
+
+try: width_SiOH
+except NameError: width_SiOH = 0.08
+
+try: width_CaOH
+except NameError: width_CaOH = 0.04
+
+try: offset_gaussian
+except NameError: offset_gaussian = False
+
+
+widths = [width_Ca_Si, width_SiOH, width_CaOH]
 
 
 np.random.seed(seed)
@@ -34,15 +48,22 @@ list_properties = []
 
 if create:
 	N_brick = shape[0]*shape[1]*shape[2]
+
+	offset = [0.0, 0.0]
+	if offset_gaussian:
+		off_Si, off_Ca = get_offset(N_samples, sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths)
+		offset = [off_Si, off_Ca]
+
 	for isample in range(N_samples):
-		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL = sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick )
+		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_H_Si = sample_Ca_Si_ratio(
+													sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, offset=offset )
 
 		N_water = int(np.rint(N_Si * W_Si_ratio))
 
 		fmt = "Sample: {: 5d}     Ca/Si: {: 8.6f}     SiOH/Si: {: 8.6f}    CaOH/Ca: {: 8.6f}    MCL: {: 8.6f}"
 		#print( fmt.format(isample+1, N_Ca/N_Si, r_SiOH, r_CaOH, MCL))
 
-		list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, isample+1] )
+		list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, isample+1, r_H_Si] )
 
 		water_in_crystal = fill_water(crystal, N_water = N_water)
 		crystal_rs, water_in_crystal_rs =  reshape_crystal(crystal, water_in_crystal, shape)
@@ -72,13 +93,15 @@ if create:
 
 	list_properties = np.array(list_properties)	
 	plot_XOH_X(list_properties)
+	plot_MCL(list_properties)
 	plot_distributions(list_properties)
+	plot_water(list_properties)
 
 	get_sorted_log(list_properties)
 
 
 if check:
-	check_SiOH_CaOH_MCL(sorted_bricks, shape)
+	check_SiOH_CaOH_MCL(sorted_bricks, widths, shape)
 	plot_experimental()
 
 
