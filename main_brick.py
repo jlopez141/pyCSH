@@ -91,8 +91,6 @@ if create:
 					 	 N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta)
 
 
-	[ print(i) for i in list_crystals ]
-
 	list_properties = np.array(list_properties)	
 	plot_XOH_X(list_properties)
 	plot_MCL(list_properties)
