@@ -113,7 +113,8 @@ pieces = { "<L"   : Piece( charge = -2, file = "<L"   ),
 
 
 class Brick(object):
-	def __init__(self, comb, pieces):
+	def __init__(self, comb, pieces, ind):
+		self.ind = ind
 		self.comb = comb
 		self.charge = 0
 		self.N_Si = 0
@@ -314,8 +315,9 @@ def get_all_bricks(pieces):
 
 	sorted_bricks = {}
 
+	ind = 0
 	for i_comb in combs:
-		b = Brick(i_comb, pieces)
+		b = Brick(i_comb, pieces, ind)
 
 		Ca_Si = round( b.N_Ca/b.N_Si, 15 )
 		Q     = b.charge
@@ -339,6 +341,8 @@ def get_all_bricks(pieces):
 					sorted_bricks[Ca_Si][Q] = {SiOH: {CaOH: [b]} }
 			else:
 				sorted_bricks[Ca_Si] = {Q: {SiOH: {CaOH: [b]} } }
+
+		ind += 1
 
 
 	return sorted_bricks
@@ -374,7 +378,7 @@ def read_brick(input_file, pieces):
 			cell = tuple([ int(aux[i]) for i in range(3) ])
 			ind1 = line.find("[")
 			comb = ast.literal_eval(line[ind1:])
-			b = Brick(comb, pieces)
+			b = Brick(comb, pieces, i)
 			crystal_rs[cell[0]][cell[1]][cell[2]] = b
 
 			N_Si += b.N_Si

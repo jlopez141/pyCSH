@@ -295,7 +295,7 @@ def plot_experimental():
 def plot_water(list_properties):
 
 
-	transp = 1.0
+	transp = 0.5
 	lw = 2
 	colors = [ "#360568", 
 	   "#4281A4", 
@@ -311,7 +311,7 @@ def plot_water(list_properties):
 	point_r_H_Si = np.array([2.072,2.071,1.747,1.4595,0.9964,0.8924,1.462,1.4322,1.2035,1.0164,0.9401,0.8701,0.7128,0.6873,0.4674])
 
 
-	plt.scatter( point_Ca_Si, point_r_H_Si, color=colors[0], alpha=transp, label="H/Si (exp)" )
+	plt.scatter( point_Ca_Si, point_r_H_Si, color=colors[0], alpha=1, label="H/Si (exp)" )
 	plt.scatter( list_properties[:,0], list_properties[:,5], color=colors[1], alpha=transp, label="H/Si (pYCSH)" )
 
 

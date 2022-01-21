@@ -5,7 +5,7 @@ from mod_write import *
 from mod_check import *
 from parameters import *
 from mod_make_graphs import *
-import os
+
 
 # Check input parameters:
 try: seed
@@ -23,6 +23,9 @@ except NameError: width_CaOH = 0.04
 try: offset_gaussian
 except NameError: offset_gaussian = False
 
+try: make_independent
+except NameError: make_independent = False
+
 
 widths = [width_Ca_Si, width_SiOH, width_CaOH]
 
@@ -30,8 +33,7 @@ widths = [width_Ca_Si, width_SiOH, width_CaOH]
 np.random.seed(seed)
 
 
-mypath = os.path.abspath(".")
-path = os.path.join(mypath, "output/")
+
 
 
 if create or check:
@@ -54,41 +56,42 @@ if create:
 		off_Si, off_Ca = get_offset(500, sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths)
 		offset = [off_Si, off_Ca]
 
+
+	list_crystals = []
+	cont = 0
+
+
+
 	for isample in range(N_samples):
-		print(isample)
 		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_2H_Si = sample_Ca_Si_ratio(
 													sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, offset=offset )
 
-		fmt = "Sample: {: 5d}     Ca/Si: {: 8.6f}     SiOH/Si: {: 8.6f}    CaOH/Ca: {: 8.6f}    MCL: {: 8.6f}"
-		#print( fmt.format(isample+1, N_Ca/N_Si, r_SiOH, r_CaOH, MCL))
 
-		list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, isample+1, r_2H_Si] )
+		crystal_index = [ brick.ind for brick in crystal ] 
 
-		water_in_crystal = fill_water(crystal, N_water = N_water)
-		crystal_rs, water_in_crystal_rs =  reshape_crystal(crystal, water_in_crystal, shape)
-		entries_crystal, entries_bonds, crystal_dict, water_dict = get_full_coordinates( crystal_rs, water_in_crystal_rs, shape, pieces )
+		new = False
 
-		entries_angle = get_angles(crystal_dict, water_dict, shape)
+		if make_independent and set(crystal_index) not in list_crystals:
+			new = True
+			list_crystals.append(set(crystal_index))
+		elif not make_independent and crystal_index not in list_crystals:
+			new = True
+			list_crystals.append(crystal_index)
 
-		if write_lammps:
-			name = "input"+str(isample+1)+".data"
-			name = os.path.join(path, name)
-			get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, shape) 
+		if new:
+			list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, isample+1, r_2H_Si] )
 
-		name = "input"+str(isample+1)+".log"
-		name = os.path.join(path, name)
-		get_log(name, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL )
+			water_in_crystal = fill_water(crystal, N_water = N_water)
+			crystal_rs, water_in_crystal_rs =  reshape_crystal(crystal, water_in_crystal, shape)
+			entries_crystal, entries_bonds, crystal_dict, water_dict = get_full_coordinates( crystal_rs, water_in_crystal_rs, shape, pieces )
 
-		if write_vasp:
-			name = "input"+str(isample+1)+".vasp"
-			name = os.path.join(path, name)
-			get_vasp_input(name, entries_crystal, shape)
+			entries_angle = get_angles(crystal_dict, water_dict, shape)
 
-		if write_siesta:
-			name = "input"+str(isample+1)+".fdf"
-			name = os.path.join(path, name)
-			get_siesta_input(name, entries_crystal, shape)
+			write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
+					 	 N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta)
 
+
+	[ print(i) for i in list_crystals ]
 
 	list_properties = np.array(list_properties)	
 	plot_XOH_X(list_properties)
@@ -99,9 +102,12 @@ if create:
 	get_sorted_log(list_properties)
 
 
+
 if check:
 	check_SiOH_CaOH_MCL(sorted_bricks, widths, shape)
 	plot_experimental()
+
+
 
 
 
@@ -110,6 +116,9 @@ if read_from_file:
 	entries_crystal, entries_bonds, crystal_dict, water_dict = get_full_coordinates( crystal_rs, water_in_crystal_rs, shape, pieces )
 
 	entries_angle = get_angles(crystal_dict, water_dict, shape)
+
+	mypath = os.path.abspath(".")
+	path = os.path.join(mypath, "output/")
 
 	name = "input_fromManualCode.data"
 	name = os.path.join(path, name)

@@ -1,5 +1,5 @@
 import numpy as np
-
+import os
 
 
 
@@ -369,3 +369,30 @@ def get_sorted_log(list_properties):
 					for MCL in sorted_MCL:
 						for i in sorted(sorted_properties[Ca_Si][SiOH][CaOH][MCL]):
 							f.write( fmt.format(int(i), Ca_Si, SiOH, CaOH, MCL) )
+
+
+
+def write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
+				  N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta):
+
+	mypath = os.path.abspath(".")
+	path = os.path.join(mypath, "output/")
+
+	if write_lammps:
+		name = "input"+str(isample+1)+".data"
+		name = os.path.join(path, name)
+		get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, shape) 
+
+	name = "input"+str(isample+1)+".log"
+	name = os.path.join(path, name)
+	get_log(name, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL )
+
+	if write_vasp:
+		name = "input"+str(isample+1)+".vasp"
+		name = os.path.join(path, name)
+		get_vasp_input(name, entries_crystal, shape)
+
+	if write_siesta:
+		name = "input"+str(isample+1)+".fdf"
+		name = os.path.join(path, name)
+		get_siesta_input(name, entries_crystal, shape)
