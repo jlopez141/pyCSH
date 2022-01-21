@@ -51,19 +51,18 @@ if create:
 
 	offset = [0.0, 0.0]
 	if offset_gaussian:
-		off_Si, off_Ca = get_offset(N_samples, sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths)
+		off_Si, off_Ca = get_offset(500, sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths)
 		offset = [off_Si, off_Ca]
 
 	for isample in range(N_samples):
-		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_H_Si = sample_Ca_Si_ratio(
+		print(isample)
+		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_2H_Si = sample_Ca_Si_ratio(
 													sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, offset=offset )
-
-		N_water = int(np.rint(N_Si * W_Si_ratio))
 
 		fmt = "Sample: {: 5d}     Ca/Si: {: 8.6f}     SiOH/Si: {: 8.6f}    CaOH/Ca: {: 8.6f}    MCL: {: 8.6f}"
 		#print( fmt.format(isample+1, N_Ca/N_Si, r_SiOH, r_CaOH, MCL))
 
-		list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, isample+1, r_H_Si] )
+		list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, isample+1, r_2H_Si] )
 
 		water_in_crystal = fill_water(crystal, N_water = N_water)
 		crystal_rs, water_in_crystal_rs =  reshape_crystal(crystal, water_in_crystal, shape)

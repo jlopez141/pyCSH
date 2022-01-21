@@ -76,13 +76,31 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, 
 		if brick_Q == 0:
 			list_elegible_water = np.array([ len(crystal[i_brick].elegible_water) for i_brick in range(N_brick) ])
 			N_water = int(np.rint(N_Si * W_Si_ratio))
-			r_H_Si = N_Oh/N_Si + 2*W_Si_ratio
+			r_2H_Si = W_Si_ratio + 0.5*N_Oh/N_Si
 
 			if np.sum(list_elegible_water) >= N_water:
 				break
+			elif np.sum(list_elegible_water) >= N_water-1:
+				N_water-= 1
+				break
 			else:
-				print("Not enough room for water!")
-				print(np.sum(list_elegible_water), N_water)
+				brick_Ca_Si = 0.0
+				brick_Q = 0.0
+				crystal = []
+				N_Si = 0
+				N_Ca = 0
+				N_SiOH = 0
+				N_SiO = 0
+				N_braket = 0
+				N_SUD = 0
+				N_Oh = 0
+			
+				cont += 1
+
+				if cont >= 5000:
+					print("Could not find any structure")
+					break
+
 		else:
 			brick_Ca_Si = 0.0
 			brick_Q = 0.0
@@ -97,7 +115,7 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, 
 		
 			cont += 1
 
-			if cont == 5000:
+			if cont >= 5000:
 				print("Could not find any structure")
 				break
 
@@ -109,7 +127,7 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, 
 	else:
 		MCL = 0
 
-	return crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_H_Si
+	return crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_2H_Si
 
 
 

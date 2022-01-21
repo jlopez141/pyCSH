@@ -316,12 +316,12 @@ def plot_water(list_properties):
 
 
 	plt.xlabel( "Si/Ca", fontsize=12 )
-	plt.ylabel( "H/Si", fontsize=12 )
+	plt.ylabel( "2H/Si", fontsize=12 )
 
 
 	plt.xlim((0.8, 2.1))
 
-	plt.legend(loc="upper right", fontsize=12)
+	plt.legend(loc="upper left", fontsize=12)
 
 	plt.tight_layout()
 	plt.savefig( "water.pdf" )
