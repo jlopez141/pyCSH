@@ -12,9 +12,17 @@ class Piece(object):
 		self.N_O_S = 0
 		self.N_Ow = 0
 		self.N_Oh = 0
+		self.N_H = 0
+		self.N_Hw = 0
 
 		self.species = []
 		self.coord = []
+
+		cell = np.array([ [6.7352,    0.0 ,      0.0],
+		 		   [-4.071295, 6.209521,  0.0],
+				   [0.7037701, -6.2095578, 13.9936836] ])
+
+		cell_inv = np.linalg.inv(cell)
 
 		with open("./Blocks_Renamed/"+file) as f:
 			lines = f.readlines()
@@ -24,7 +32,7 @@ class Piece(object):
 				specie = aux[0]
 
 				aux = lines[i*2+1].split()
-				r = [ float(x) for x in aux ]
+				r = np.array([ float(x) for x in aux ])
 
 				if specie == "Ca":
 					self.species.append( 1 )
@@ -41,12 +49,31 @@ class Piece(object):
 				if specie == "Ow" : 
 					self.species.append( 5 )
 					self.N_Ow += 1
+
+					if r[2] > 0.0:
+						self.r_H1 = np.array([0, 0, -1.0])
+					else:
+						self.r_H1 = np.array([0, 0, 1.0])
+
+					if r[1] > 0.0:
+						self.r_H2 = np.array([0, -1.0, 0])
+					else:
+						self.r_H2 = np.array([0, 1.0, 0])
+
 				if specie == "Oh" : 
 					self.species.append( 6 )
 					self.N_Oh += 1
 
-				self.coord.append( np.array([ float(x) for x in aux ] ))
+					if r[2] > 0.0:
+						self.r_H1 = np.array([0, 0, -1.0])
+					else:
+						self.r_H1 = np.array([0, 0, 1.0])
+						
 
+
+				frac_r = np.matmul(r, cell_inv) + np.array([0.5, 0.5, 0.5])
+				r = np.matmul(frac_r, cell)
+				self.coord.append( r )
 
 
 pieces = { "<L"   : Piece( charge = -2, file = "<L"   ),

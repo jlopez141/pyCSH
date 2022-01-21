@@ -52,10 +52,7 @@ def get_coordinates_brick( atom_index, bond_index, pieces, v_cell, supercell, su
 
 			# If "Oh" add hydroxyl "H"
 			if specie == 6:
-				if pieces[piece].coord[iat][2] > 0.0:
-					r_H = np.array([ r[0], r[1], r[2] - 1.0 ])
-				elif pieces[piece].coord[iat][2] < 0.0:
-					r_H = np.array([ r[0], r[1], r[2] + 1.0 ])
+				r_H = r + pieces[piece].r_H1
 
 				#r_H = apply_PBC(r_H, supercell, supercell_inv)
 
@@ -102,10 +99,7 @@ def get_coordinates_brick( atom_index, bond_index, pieces, v_cell, supercell, su
 		atom_index += 1
 
 		# 1st hydrogen
-		if pieces[w].coord[iat][2] > 0.0:
-			r_H = np.array([ r[0], r[1], r[2] - 1.0 ])
-		else:
-			r_H = np.array([ r[0], r[1], r[2] + 1.0 ])
+		r_H = r + pieces[w].r_H1
 		#r_H = apply_PBC(r_H, supercell, supercell_inv)
 		entry = [ atom_index, 7, charges[7],  r_H[0], r_H[1], r_H[2] ]
 		piece_entries.append(entry)
@@ -119,10 +113,7 @@ def get_coordinates_brick( atom_index, bond_index, pieces, v_cell, supercell, su
 		atom_index += 1
 
 		# 2nd hydrogen
-		if pieces[piece].coord[iat][1] > 0.0:
-			r_H = np.array([ r[0], r[1] -1.0 , r[2] ])
-		else:
-			r_H = np.array([ r[0], r[1] + 1.0, r[2] ])
+		r_H = r + pieces[w].r_H2
 		#r_H = apply_PBC(r_H, supercell, supercell_inv)
 		entry = [ atom_index, 7, charges[7],  r_H[0], r_H[1], r_H[2] ]
 		at_entries.append(entry)
@@ -190,51 +181,53 @@ def get_angles(crystal_dict, water_dict, shape):
 	for cell in crystal_dict.keys():
 
 		# Upper "<L" or "<Lo"
-		piece = "<Lo"
-		if "<L" in crystal_dict[cell]: piece = "<L"
+		if "<Lo" in crystal_dict[cell] or "<L" in  crystal_dict[cell]:
+			piece = "<Lo"
+			if "<L" in crystal_dict[cell]: piece = "<L"
 
-		ind_Si = crystal_dict[cell][piece][1][0]
-		ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6,8] ]
+			ind_Si = crystal_dict[cell][piece][1][0]
+			ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6,8] ]
 
-		for i_O in range(len(ind_O)):
-			for j_O in range( i_O+1, len(ind_O) ):
-				angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
+			for i_O in range(len(ind_O)):
+				for j_O in range( i_O+1, len(ind_O) ):
+					angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
+					angle_index += 1
+
+			if piece == "<Lo":
+				ind_Oh  = crystal_dict[cell][piece][8][0]
+				angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
 				angle_index += 1
-
-		if piece == "<Lo":
-			ind_Oh  = crystal_dict[cell][piece][8][0]
-			angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
-			angle_index += 1
 
 
 
 		# Upper "<R" or "<Ro"
-		piece = "<Ro"
-		if "<R" in crystal_dict[cell]: piece = "<R"
+		if "<Ro" in crystal_dict[cell] or "<R" in  crystal_dict[cell]:
+			piece = "<Ro"
+			if "<R" in crystal_dict[cell]: piece = "<R"
 
-		ind_Si = crystal_dict[cell][piece][1][0]
-		ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6] ]
+			ind_Si = crystal_dict[cell][piece][1][0]
+			ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6] ]
 
-		# Pick 3th oxygen in the next cell
-		next_cell = [cell[0], cell[1]+1,cell[2]]
-		if next_cell[1] == shape[1]: next_cell[1] = 0
-		next_cell = tuple(next_cell)
+			# Pick 3th oxygen in the next cell
+			next_cell = [cell[0], cell[1]+1,cell[2]]
+			if next_cell[1] == shape[1]: next_cell[1] = 0
+			next_cell = tuple(next_cell)
 
-		next_piece = "<Lo"
-		if "<L" in crystal_dict[next_cell]: next_piece = "<L"
-		ind_O_next = crystal_dict[next_cell][next_piece][6][0]
+			next_piece = "<Lo"
+			if "<L" in crystal_dict[next_cell]: next_piece = "<L"
+			ind_O_next = crystal_dict[next_cell][next_piece][6][0]
 
 
-		ind_O.append(ind_O_next)
+			ind_O.append(ind_O_next)
 
-		for i_O in range(len(ind_O)):
-			for j_O in range( i_O+1, len(ind_O) ):
-				angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
-				angle_index += 1
+			for i_O in range(len(ind_O)):
+				for j_O in range( i_O+1, len(ind_O) ):
+					angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
+					angle_index += 1
 
-		if piece == "<Ro":
-			ind_Oh  = crystal_dict[cell][piece][6][0]
-			angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
+			if piece == "<Ro":
+				ind_Oh  = crystal_dict[cell][piece][6][0]
+				angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
 			angle_index += 1
 
 
@@ -273,52 +266,54 @@ def get_angles(crystal_dict, water_dict, shape):
 			
 
 		# Bellow ">R" or ">Ro"
-		piece = ">Ro"
-		if ">R" in crystal_dict[cell]: piece = ">R"
+		if ">Ro" in crystal_dict[cell] or ">R" in  crystal_dict[cell]:
+			piece = ">Ro"
+			if ">R" in crystal_dict[cell]: piece = ">R"
 
-		ind_Si = crystal_dict[cell][piece][1][0]
-		ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6,8] ]
+			ind_Si = crystal_dict[cell][piece][1][0]
+			ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6,8] ]
 
 
-		for i_O in range(len(ind_O)):
-			for j_O in range( i_O+1, len(ind_O) ):
-				angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
+			for i_O in range(len(ind_O)):
+				for j_O in range( i_O+1, len(ind_O) ):
+					angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
+					angle_index += 1
+
+			if piece == ">Ro":
+				ind_Oh  = crystal_dict[cell][piece][8][0]
+				angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
 				angle_index += 1
-
-		if piece == ">Ro":
-			ind_Oh  = crystal_dict[cell][piece][8][0]
-			angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
-			angle_index += 1
 
 
 		# Bellow ">L" or ">Lo"
-		piece = ">Lo"
-		if ">L" in crystal_dict[cell]: piece = ">L"
+		if ">Lo" in crystal_dict[cell] or ">L" in  crystal_dict[cell]:
+			piece = ">Lo"
+			if ">L" in crystal_dict[cell]: piece = ">L"
 
-		ind_Si = crystal_dict[cell][piece][1][0]
-		ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6] ]
+			ind_Si = crystal_dict[cell][piece][1][0]
+			ind_O = [ crystal_dict[cell][piece][i][0] for i in [2,4,6] ]
 
-		# Pick 3th oxygen in the previous cell
-		prev_cell = [cell[0], cell[1]-1,cell[2]]
-		if prev_cell[1] == -1: prev_cell[1] = shape[1]-1
-		prev_cell = tuple(prev_cell)
+			# Pick 3th oxygen in the previous cell
+			prev_cell = [cell[0], cell[1]-1,cell[2]]
+			if prev_cell[1] == -1: prev_cell[1] = shape[1]-1
+			prev_cell = tuple(prev_cell)
 
-		prev_piece = ">Ro"
-		if ">R" in crystal_dict[prev_cell]: prev_piece = ">R"
-		ind_O_prev = crystal_dict[prev_cell][prev_piece][6][0]
+			prev_piece = ">Ro"
+			if ">R" in crystal_dict[prev_cell]: prev_piece = ">R"
+			ind_O_prev = crystal_dict[prev_cell][prev_piece][6][0]
 
 
-		ind_O.append(ind_O_prev)
+			ind_O.append(ind_O_prev)
 
-		for i_O in range(len(ind_O)):
-			for j_O in range( i_O+1, len(ind_O) ):
-				angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
+			for i_O in range(len(ind_O)):
+				for j_O in range( i_O+1, len(ind_O) ):
+					angle_entries.append( [angle_index, 2, ind_O[i_O], ind_Si, ind_O[j_O]] )
+					angle_index += 1
+
+			if piece == ">Lo":
+				ind_Oh  = crystal_dict[cell][piece][6][0]
+				angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
 				angle_index += 1
-
-		if piece == ">Lo":
-			ind_Oh  = crystal_dict[cell][piece][6][0]
-			angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
-			angle_index += 1
 
 
 
