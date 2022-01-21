@@ -8,13 +8,13 @@ Shape:  1   1   4
 Supecell Brick Code: 
  Na  Nb  Nc  :   Brick Code 
              :   Water Code 
-  0   0   0  :   ['<L', "SUo", '<R', "CII",  '>L', "SDo", '>R'] 
+  0   0   0  :   ['<Lo', "SUo", '<Ro', '>L', '>R'] 
              :   [] 
   0   0   1  :   ['<L', "SUo", '<R', "CII",  '>L', "SDo", '>R']
              :   [] 
   0   0   2  :   ['<L', "SUo", '<R', "CII",  '>L', "SDo", '>R']
              :   [] 
-  0   0   3  :   ['<L', "SUo", '<R', "CII",  '>L', "SDo", '>R']
+  0   0   3  :   [ '>L', '>R']
              :   [] 
 
 Charge Distribution: 

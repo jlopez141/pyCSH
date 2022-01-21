@@ -12,14 +12,33 @@ width_Ca_Si = 0.05
 width_SiOH = 0.08
 width_CaOH = 0.04
 
-create = False
-check = False
+create = True
+check = True
+
+
+write_lammps = True
+write_vasp = True
+write_siesta = False
+
+
+
 
 
 read_from_file = True
 input_file = "pruebas.log"
 
 
-write_lammps = True
-write_vasp = True
-write_siesta = False
+shape_read = (1, 1, 4)
+surface_separation = 20.0
+brick_code = { 
+(  0,   0,   0)  :   ['<Lo', '<Ro'], 
+(  0,   0,   1)  :   ['<L', 'SUo', '<R', 'CII', '>L', 'SDo', '>R'], 
+(  0,   0 ,  2)  :   ['<L', 'SUo', '<R', 'CII', '>L', 'SDo', '>R'], 
+(  0,   0 ,  3)  :   ['>L', '>R'], 
+}
+water_code = { 
+(  0  , 0 ,  0)  :   [], 
+(  0  , 0 ,  1)  :   [], 
+(  0 ,  0,   2)  :   [], 
+(  0 ,  0  , 3)  :   [], 
+}

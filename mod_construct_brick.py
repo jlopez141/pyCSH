@@ -68,7 +68,7 @@ class Piece(object):
 						self.r_H1 = np.array([0, 0, -1.0])
 					else:
 						self.r_H1 = np.array([0, 0, 1.0])
-						
+
 
 
 				frac_r = np.matmul(r, cell_inv) + np.array([0.5, 0.5, 0.5])
@@ -431,3 +431,59 @@ def read_brick(input_file, pieces):
 		MCL = 0
 
 	return shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL
+
+
+
+
+
+# def read_brick(shape_read, brick_code, water_code, pieces):
+
+
+# 	shape = shape_read
+# 	N_brick = shape[0]*shape[1]*shape[2]
+
+# 	crystal_rs = [ [ [ 0 for k in range(shape[2]) ] for j in range(shape[1]) ] for i in range(shape[0]) ]
+
+# 	water_in_crystal_rs = [ [ [ 0 for k in range(shape[2]) ] for j in range(shape[1]) ] for i in range(shape[0]) ]
+
+# 	N_Si = 0
+# 	N_Ca = 0
+# 	N_SiOH = 0
+# 	N_Oh = 0
+# 	N_braket = 0
+# 	N_SUD = 0
+
+# 	for i in range( N_brick ):
+# 		line = lines[10+2*i]
+# 		aux = line.split()
+# 		cell = tuple([ int(aux[i]) for i in range(3) ])
+# 		ind1 = line.find("[")
+# 		comb = ast.literal_eval(line[ind1:])
+# 		b = Brick(comb, pieces, i)
+# 		crystal_rs[cell[0]][cell[1]][cell[2]] = b
+
+# 		N_Si += b.N_Si
+# 		N_Ca += b.N_Ca
+# 		N_SiOH += b.N_SiOH
+# 		N_Oh += b.N_Oh
+# 		N_braket += b.N_braket
+# 		N_SUD += b.N_SUD
+
+
+# 		line = lines[11+2*i]
+# 		ind1 = line.find("[")
+# 		water_in_crystal_rs[cell[0]][cell[1]][cell[2]] = ast.literal_eval(line[ind1:])
+
+
+
+# 	crystal_rs = np.array(crystal_rs)
+# 	water_in_crystal_rs = np.array(water_in_crystal_rs,dtype=object)
+
+# 	r_SiOH = N_SiOH/N_Si
+# 	r_CaOH = (N_Oh-N_SiOH)/N_Ca
+# 	if N_braket != 2*N_SUD:
+# 		MCL =  (N_braket+N_SUD)/(0.5*N_braket-N_SUD)
+# 	else:
+# 		MCL = 0
+
+# 	return shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL
