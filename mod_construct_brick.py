@@ -227,7 +227,7 @@ def above_layer():
 			for i_left in [["<L"], ["<Lo"]]:
 				for i_right in  [["<R"], ["<Ro"]]:
 					for oh_bridge_1 in [ [None], ["oMUL"] ]:
-						for oh_bridge_2 in [ [None], ["oMUL"] ]:
+						for oh_bridge_2 in [ [None], ["oMUR"] ]:
 							comb = i_left + i_bridge + oh_bridge_1 + oh_bridge_2 + i_right
 
 							combs_above.append( [x for x in comb if x is not None] )
@@ -256,7 +256,7 @@ def below_layer():
 			for i_left in [[">L"], [">Lo"]]:
 				for i_right in  [[">R"], [">Ro"]]:
 					for oh_bridge_1 in [ [None], ["oMDL"] ]:
-						for oh_bridge_2 in [ [None], ["oMDL"] ]:
+						for oh_bridge_2 in [ [None], ["oMDR"] ]:
 							comb = i_left + i_bridge + oh_bridge_1 + oh_bridge_2 + i_right
 
 							combs_below.append( [x for x in comb if x is not None] )
