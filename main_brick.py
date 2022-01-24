@@ -26,6 +26,9 @@ except NameError: offset_gaussian = False
 try: make_independent
 except NameError: make_independent = False
 
+try: surface_separation
+except NameError: surface_separation = False
+
 
 widths = [width_Ca_Si, width_SiOH, width_CaOH]
 
@@ -41,7 +44,7 @@ if create or check:
 	sorted_bricks = get_all_bricks(pieces)
 
 
-if create or read_from_file:
+if create or read_structure:
 	if not os.path.isdir("./output"):
 		os.makedirs('./output')
 
@@ -49,6 +52,17 @@ if create or read_from_file:
 list_properties = []
 
 if create:
+
+	unitcell = np.array([ [6.7352,    0.0 ,      0.0],
+				 		   [-4.071295, 6.209521,  0.0],
+						   [0.7037701, -6.2095578, 13.9936836] ])
+
+	supercell = np.zeros((3,3))
+	for i in range(3):
+		supercell[i,:] = unitcell[i,:]*shape[i]
+
+
+
 	N_brick = shape[0]*shape[1]*shape[2]
 
 	offset = [0.0, 0.0]
@@ -88,7 +102,7 @@ if create:
 			entries_angle = get_angles(crystal_dict, water_dict, shape)
 
 			write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
-					 	 N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta)
+					 	  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta)
 
 
 	list_properties = np.array(list_properties)	
@@ -109,26 +123,43 @@ if check:
 
 
 
-if read_from_file:
-	shape, crystal_rs, water_in_crystal_rs, N_Si, N_Ca, r_SiOH, r_CaOH, MCL = read_brick(input_file, pieces)
+if read_structure:
+
+
+
+	shape, crystal_rs, water_in_crystal_rs, N_Si, N_Ca, r_SiOH, r_CaOH, MCL = read_brick(shape_read, brick_code, water_code, pieces)
 	entries_crystal, entries_bonds, crystal_dict, water_dict = get_full_coordinates( crystal_rs, water_in_crystal_rs, shape, pieces )
 
 	entries_angle = get_angles(crystal_dict, water_dict, shape)
+
+
+
+	unitcell = np.array([ [6.7352,    0.0 ,      0.0],
+				 		   [-4.071295, 6.209521,  0.0],
+						   [0.7037701, -6.2095578, 13.9936836] ])
+
+	supercell = np.zeros((3,3))
+	for i in range(3):
+		supercell[i,:] = unitcell[i,:]*shape[i]
+
+
+	if surface_separation:
+		entries_crystal, supercell = transform_surface_separation(entries_crystal, supercell, surface_separation)		
 
 	mypath = os.path.abspath(".")
 	path = os.path.join(mypath, "output/")
 
 	name = "input_fromManualCode.data"
 	name = os.path.join(path, name)
-	get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, shape) 
+	get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell) 
 	name = "input_fromManualCode.log"
 	name = os.path.join(path, name)
 	get_log(name, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL )
 
 	name = "input_fromManualCode.vasp"
 	name = os.path.join(path, name)
-	get_vasp_input(name, entries_crystal, shape)
+	get_vasp_input(name, entries_crystal, supercell)
 
 	name = "input_fromManualCode.fdf"
 	name = os.path.join(path, name)
-	get_siesta_input(name, entries_crystal, shape)
+	get_siesta_input(name, entries_crystal, supercell)

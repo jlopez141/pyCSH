@@ -3,16 +3,7 @@ import os
 
 
 
-def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, shape):
-
-	unit_cell = np.array([ [6.7352,    0.0 ,      0.0],
-			 		   [-4.071295, 6.209521,  0.0],
-					   [0.7037701, -6.2095578, 13.9936836] ])
-
-	cell = np.zeros((3,3))
-	for i in range(3):
-		cell[i,:] = unit_cell[i,:]*shape[i]
-	cell_inv = np.linalg.inv(cell)
+def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, supercell):
 
 	N_atom = len(entries_crystal)
 	N_bond = len(entries_bonds)
@@ -27,10 +18,10 @@ def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, 
 		f.write( "{: 8d} bond types \n".format(3) )
 		f.write( "{: 8d} angle types \n".format(3) )
 		f.write( " \n" )
-		f.write( "{: 12.6f} {: 12.6f} xlo xhi \n".format(0.0, cell[0,0]) )
-		f.write( "{: 12.6f} {: 12.6f} ylo yhi \n".format(0.0, cell[1,1]) )
-		f.write( "{: 12.6f} {: 12.6f} zlo zhi \n".format(0.0, cell[2,2]) )
-		f.write( "{: 12.6f} {: 12.6f} {: 12.6f} xy xz yz \n".format( cell[1,0], cell[2,0], cell[2,1] ) )
+		f.write( "{: 12.6f} {: 12.6f} xlo xhi \n".format(0.0, supercell[0,0]) )
+		f.write( "{: 12.6f} {: 12.6f} ylo yhi \n".format(0.0, supercell[1,1]) )
+		f.write( "{: 12.6f} {: 12.6f} zlo zhi \n".format(0.0, supercell[2,2]) )
+		f.write( "{: 12.6f} {: 12.6f} {: 12.6f} xy xz yz \n".format( supercell[1,0], supercell[2,0], supercell[2,1] ) )
 		f.write( " \n" )
 		f.write( "Masses \n" )
 		f.write( " \n" )
@@ -67,7 +58,7 @@ def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, 
 
 
 
-def get_vasp_input(name, entries_crystal, shape):
+def get_vasp_input(name, entries_crystal, supercell):
 
 	N_atoms_specie = np.zeros(6,dtype=int)
 
@@ -82,24 +73,9 @@ def get_vasp_input(name, entries_crystal, shape):
 	coords_Hw = []
 	coords_H = []
 
-
-	unit_cell = np.array([ [6.7352, -4.071295, 0.7037701],
-				  [0.0, 6.209521, -6.2095578],
-				  [0.0, 0.0, 13.9936836] ])
-
-	unit_cell = np.array([ [6.7352,    0.0 ,      0.0],
-				 		   [-4.071295, 6.209521,  0.0],
-						   [0.7037701, -6.2095578, 13.9936836] ])
-
-	cell = np.zeros((3,3))
-	for i in range(3):
-		cell[i,:] = unit_cell[i,:]*shape[i]
-	cell_inv = np.linalg.inv(cell)
-
 	for entry in entries_crystal:
 		specie = entry[1]
 		r = np.array( entry[3:] )
-		#r = apply_PBC(r, cell, cell_inv)
 
 		if specie == 1:
 			coords_Ca.append(r)
@@ -143,7 +119,7 @@ def get_vasp_input(name, entries_crystal, shape):
 	with open( name, "w" ) as f:
 		f.write( "kk \n" )
 		f.write( "1.0 \n" )
-		for i in cell:
+		for i in supercell:
 			f.write( "{: 12.6f} {: 12.6f} {: 12.6f} \n".format(*i) )
 		f.write( "Ca  Si  O  Ow   Hw  H \n" )
 		f.write( "{: 5d} {: 5d} {: 5d} {: 5d} {: 5d} {: 5d} \n".format(*N_atoms_specie) )
@@ -216,7 +192,7 @@ def get_log(log_file, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH
 
 
 
-def get_siesta_input(name, entries_crystal, shape):
+def get_siesta_input(name, entries_crystal, supercell):
 
 	N_atoms_specie = np.zeros(4,dtype=int)
 
@@ -224,15 +200,6 @@ def get_siesta_input(name, entries_crystal, shape):
 	coords_Si = []
 	coords_O = []
 	coords_H = []
-
-
-	unit_cell = np.array([ [6.7352,    0.0 ,      0.0],
-			 		   [-4.071295, 6.209521,  0.0],
-					   [0.7037701, -6.2095578, 13.9936836] ])
-
-	cell = np.zeros((3,3))
-	for i in range(3):
-		cell[i,:] = unit_cell[i,:]*shape[i]
 
 
 
@@ -321,7 +288,7 @@ def get_siesta_input(name, entries_crystal, shape):
 		f.write( " \n" )
 		f.write( "%block LatticeVectors \n" )
 		for i in range(3):
-			f.write( "{: 12.6f} {: 12.6f} {: 12.6f} \n".format( *cell[i,:] ) )
+			f.write( "{: 12.6f} {: 12.6f} {: 12.6f} \n".format( *supercell[i,:] ) )
 		f.write( "%endblock LatticeVectors \n" )
 		f.write( " \n" )
 		f.write( " \n" )
@@ -381,7 +348,7 @@ def get_sorted_log(list_properties):
 
 
 def write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
-				  N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta):
+				  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta):
 
 	mypath = os.path.abspath(".")
 	path = os.path.join(mypath, "output/")
@@ -389,7 +356,7 @@ def write_output( isample, entries_crystal, entries_bonds, entries_angle, shape,
 	if write_lammps:
 		name = "input"+str(isample+1)+".data"
 		name = os.path.join(path, name)
-		get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, shape) 
+		get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell) 
 
 	name = "input"+str(isample+1)+".log"
 	name = os.path.join(path, name)
@@ -398,9 +365,9 @@ def write_output( isample, entries_crystal, entries_bonds, entries_angle, shape,
 	if write_vasp:
 		name = "input"+str(isample+1)+".vasp"
 		name = os.path.join(path, name)
-		get_vasp_input(name, entries_crystal, shape)
+		get_vasp_input(name, entries_crystal, supercell)
 
 	if write_siesta:
 		name = "input"+str(isample+1)+".fdf"
 		name = os.path.join(path, name)
-		get_siesta_input(name, entries_crystal, shape)
+		get_siesta_input(name, entries_crystal, supercell)

@@ -353,3 +353,22 @@ def get_angles(crystal_dict, water_dict, shape):
 			angle_index += 1
 
 	return angle_entries
+
+
+def transform_surface_separation(crystal_entries, supercell, surface_separation):
+
+	vec_c = np.array([0.7037701, -6.2095578, 13.9936836])
+	c = np.linalg.norm(vec_c)
+	vec_d = vec_c*surface_separation/c
+
+
+	new_entries = []
+	for entry in crystal_entries:
+		r = np.array(entry[3:])
+		r = r +0.5*(vec_d - vec_c)
+
+		new_entries.append( [ entry[0], entry[1], entry[2], r[0],  r[1],  r[2] ] )
+
+	supercell[2,:] = supercell[2,:] + vec_d - vec_c
+
+	return new_entries, supercell
