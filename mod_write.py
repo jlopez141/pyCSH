@@ -164,16 +164,13 @@ def get_log(log_file, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH
 		f.write( "Shape: {: 3d} {: 3d} {: 3d} \n".format(*shape) )
 		f.write( " \n" )
 		f.write( "Supecell Brick Code: \n" )
-		f.write( " Na  Nb  Nc  :   Brick Code \n" )
+		f.write( " Na  Nb  Nc  :   Brick Code \n\n" )
 		f.write( "brick_code = { \n" )
 		for i in range(shape[0]):
 			for j in range(shape[1]):
 				for k in range(shape[2]):
 					f.write( "({: 3d}, {: 3d}, {: 3d})  :   {:}, \n".format(i, j, k, crystal_rs[i,j, k].comb) )
-		f.write("}\n")
-
-		f.write( "Water Brick Code: \n" )
-		f.write( " Na  Nb  Nc  :   Brick Code \n" )
+		f.write("}\n\n")
 		f.write( "water_code = { \n" )
 		for i in range(shape[0]):
 			for j in range(shape[1]):

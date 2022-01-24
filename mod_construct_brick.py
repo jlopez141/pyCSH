@@ -436,10 +436,33 @@ def get_all_bricks(pieces):
 
 
 
-def read_brick(shape_read, brick_code, water_code, pieces):
-
+def read_brick(shape_read, brick_code, water_code, pieces, surface_from_bulk):
 
 	shape = shape_read
+
+	if surface_from_bulk:
+		shape = ( shape[0], shape[1], shape[2]+2 )
+
+		new_brick_code = dict()
+		new_water_code = dict()
+
+		for cell in brick_code.keys():
+			key = (cell[0], cell[1], cell[2]+1)
+			new_brick_code[key] = brick_code[cell]
+			new_water_code[key] = water_code[cell]
+
+		for i in range(shape[0]):
+			for j in range(shape[1]):
+				new_brick_code[(i,j,0)] = ["<Lo", "<Ro"]
+				new_brick_code[(i,j,shape[2]-1)] = [">Lo", ">Ro"]
+
+				new_water_code[(i,j,0)] = []
+				new_water_code[(i,j,shape[2]-1)] = []
+
+		brick_code = new_brick_code
+		water_code = new_water_code
+
+
 	N_brick = shape[0]*shape[1]*shape[2]
 
 	crystal_rs = [ [ [ 0 for k in range(shape[2]) ] for j in range(shape[1]) ] for i in range(shape[0]) ]

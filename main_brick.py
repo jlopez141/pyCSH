@@ -26,8 +26,27 @@ except NameError: offset_gaussian = False
 try: make_independent
 except NameError: make_independent = False
 
+try: create
+except NameError: create = False
+
+try: check
+except NameError: check = False
+
+try: write_lammps
+except NameError: write_lammps = True
+
+try: write_vasp
+except NameError: write_vasp = False
+
+try: write_siesta
+except NameError: write_siesta = False
+
+try: read_structure
+except NameError: read_structure = False
+
 try: surface_separation
 except NameError: surface_separation = False
+
 
 
 widths = [width_Ca_Si, width_SiOH, width_CaOH]
@@ -125,9 +144,8 @@ if check:
 
 if read_structure:
 
-
-
-	shape, crystal_rs, water_in_crystal_rs, N_Si, N_Ca, r_SiOH, r_CaOH, MCL = read_brick(shape_read, brick_code, water_code, pieces)
+	shape, crystal_rs, water_in_crystal_rs, N_Si, N_Ca, r_SiOH, r_CaOH, MCL = read_brick(shape_read, brick_code, water_code, pieces, surface_from_bulk)
+	
 	entries_crystal, entries_bonds, crystal_dict, water_dict = get_full_coordinates( crystal_rs, water_in_crystal_rs, shape, pieces )
 
 	entries_angle = get_angles(crystal_dict, water_dict, shape)
