@@ -101,7 +101,7 @@ def smear_distr(Y, width):
 
 def plot_distributions(list_properties):
 
-	transp = 1.0
+	transp = 0.8
 	colors = [ "#360568", 
 	   "#4281A4", 
 	   "#7FC29B", 
@@ -116,29 +116,34 @@ def plot_distributions(list_properties):
 
 	Nbins = 15
 
-	fig, ( (ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+	#fig, ( (ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2)
+	fig, axes = plt.subplots(2,3)
+	axes[1][2].set_visible(False)
 
 	#X, Y = smear_distr(list_properties[:,0], width=width_1)
 	#ax1.plot(X, Y)
-	ax1.hist(list_properties[:,0], bins=Nbins, density=True,  color=colors[0], alpha=transp,)
+	axes[0][0].hist(list_properties[:,0], bins=Nbins, density=True,  color=colors[0], alpha=transp,)
 
 	#X, Y = smear_distr(list_properties[:,1], width=width_1)
 	#ax2.plot(X, Y)
-	ax2.hist(list_properties[:,1], bins=Nbins, density=True, color=colors[1], alpha=transp,)
+	axes[0][1].hist(list_properties[:,1], bins=Nbins, density=True, color=colors[1], alpha=transp,)
 
 	#X, Y = smear_distr(list_properties[:,2], width=width_1)
 	#ax3.plot(X, Y)
-	ax3.hist(list_properties[:,2], bins=Nbins, density=True, color=colors[2], alpha=transp,)
+	axes[0][2].hist(list_properties[:,2], bins=Nbins, density=True, color=colors[2], alpha=transp,)
 
 	#X, Y = smear_distr(list_properties[:,3], width=width_2)
 	#ax4.plot(X, Y)
-	ax4.hist(list_properties[:,3], bins=Nbins, density=True, color=colors[3], alpha=transp,)
+	axes[1][0].hist(list_properties[:,3], bins=Nbins, density=True, color=colors[3], alpha=transp,)
+
+	axes[1][1].hist(list_properties[:,5], bins=Nbins, density=True, color=colors[4], alpha=transp,)
 
 
-	ax1.set_xlabel("Ca/Si")
-	ax2.set_xlabel("SiOH/Si")
-	ax3.set_xlabel("CaOH/Ca")
-	ax4.set_xlabel("MCL")
+	axes[0][0].set_xlabel("Ca/Si")
+	axes[0][1].set_xlabel("SiOH/Si")
+	axes[0][2].set_xlabel("CaOH/Ca")
+	axes[1][0].set_xlabel("MCL")
+	axes[1][1].set_xlabel("2H/Si")
 
 	plt.tight_layout()
 	plt.savefig( "distributions.pdf" )
