@@ -355,9 +355,11 @@ def get_angles(crystal_dict, water_dict, shape):
 	return angle_entries
 
 
-def transform_surface_separation(crystal_entries, supercell, surface_separation):
 
-	vec_c = np.array([0.7037701, -6.2095578, 13.9936836])
+
+def transform_surface_separation(crystal_entries, supercell, unitcell, surface_separation):
+
+	vec_c = unitcell[2]
 	c = np.linalg.norm(vec_c)
 	vec_d = vec_c*surface_separation/c
 
@@ -372,3 +374,83 @@ def transform_surface_separation(crystal_entries, supercell, surface_separation)
 	supercell[2,:] = supercell[2,:] + vec_d - vec_c
 
 	return new_entries, supercell
+
+
+# def transform_surface_separation(crystal_entries, supercell, unitcell, surface_separation):
+
+# 	vec_a = supercell[0,:]
+# 	vec_b = supercell[1,:]
+# 	vec_c = supercell[2,:]
+
+# 	a = np.linalg.norm(vec_a)
+# 	b = np.linalg.norm(vec_b)
+# 	c = np.linalg.norm(vec_c)
+
+# 	beta = np.arccos( np.dot(vec_a, vec_c)/a/c )
+# 	alpha = np.arccos( np.dot(vec_b, vec_c)/b/c ) #100*np.pi/180
+
+# 	c_new_1 = a*c*np.cos(beta)/vec_a[0]
+# 	c_new_2 = b*c/vec_b[1]*np.cos(alpha)-vec_b[0]/vec_b[1] * c_new_1
+# 	c_new_3 = np.sqrt( c**2 - c_new_1**2 - c_new_2**2 )
+# 	vec_c_new = np.array([c_new_1, c_new_2, c_new_3])
+
+# 	print(vec_c_new)
+
+# 	vec_d = vec_c*surface_separation/c
+
+# 	trans_mat = np.eye(3)
+# 	trans_mat[0,2] = (vec_c_new[0] - vec_c[0] )/vec_c[2]
+# 	trans_mat[1,2] = (vec_c_new[1] - vec_c[1] )/vec_c[2]
+# 	trans_mat[2,2] = vec_c_new[2]/vec_c[2]
+
+
+
+
+
+# 	vec_c =unitcell[2,:]
+# 	c = np.linalg.norm(vec_c)
+# 	vec_d = vec_c*surface_separation/c
+
+
+# 	new_entries = []
+# 	for entry in crystal_entries:
+# 		r = np.array(entry[3:])
+# 		#r = r +0.5*(vec_d - vec_c)
+
+# 		r = np.dot(trans_mat, r)
+
+# 		new_entries.append( [ entry[0], entry[1], entry[2], r[0],  r[1],  r[2] ] )
+
+# 	#supercell[2,:] = supercell[2,:] + vec_d - vec_c
+
+# 	for i in range(3):
+# 		supercell[i,:] = np.dot(trans_mat, supercell[i,:])
+
+# 	return new_entries, supercell
+
+
+# def reshape_unitcell(crystal_entries, supercell, cell):
+# 	vec_a = supercell[0,:]
+# 	vec_b = supercell[1,:]
+# 	vec_c = supercell[2,:]
+
+# 	a = np.linalg.norm(vec_a)
+# 	b = np.linalg.norm(vec_b)
+# 	c = np.linalg.norm(vec_c)
+
+# 	beta = np.arccos( np.dot(vec_a, vec_c)/a/c )
+# 	alpha = 100*np.pi/180
+
+# 	c_new_1 = a*c*np.cos(beta)/vec_a[0]
+# 	c_new_2 = b*c/vec_b[1]*np.cos(alpha)-vec_b[0]/vec_b[1] * c_new_1
+# 	c_new_3 = np.sqrt( c**2 - c_new_1**2 - c_new_2**2 )
+# 	vec_c_new = np.array([c_new_1, c_new_2, c_new_3])
+
+# 	print(vec_c_new)
+
+# 	vec_d = vec_c*surface_separation/c
+
+# 	trans_mat = np.eye(3)
+# 	trans_mat[0,2] = (vec_c_new[0] - vec_c[0] )/vec_c[2]
+# 	trans_mat[1,2] = (vec_c_new[1] - vec_c[1] )/vec_c[2]
+# 	trans_mat[2,2] = vec_c_new[2]/vec_c[2]

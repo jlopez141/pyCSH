@@ -1,7 +1,7 @@
 seed = 1123
 shape = (2,2,2)   # Minimum (1,1,1)
-Ca_Si_ratio = 1.75
-W_Si_ratio  = 1.1
+Ca_Si_ratio = 1.7
+W_Si_ratio  = 1.0
 
 N_samples = 100
 make_independent = True
@@ -13,7 +13,7 @@ width_SiOH = 0.08
 width_CaOH = 0.04
 
 create = True
-check = False
+check = True
 
 
 write_lammps = True
@@ -30,27 +30,27 @@ write_siesta = False
 # by adding upper (">Lo", ">Ro") and lower ("<Lo", "<Ro") chains
 
 
-read_structure = True
+read_structure = False
 
-surface_from_bulk = True
-surface_separation = False #20.0
+surface_from_bulk = False
+surface_separation = False
 
 
 shape_read = (1, 1, 1)
 brick_code = { 
-(  0,   0,   0)  :   ['<L', 'SUo', '<R', 'CII', '>L', 'SDo', '>R'],
+(  0,   0,   0)  :   ['<L', 'SUo', '<R', 'CII', '>L', 'SDo', '>R'], 
 }
 
 water_code = { 
-(  0,   0,  0)  :   [], 
+(  0,   0,  0)  :   [ "wMUL", "wMUR", "wIL", "wIR2" ], 
 }
 
-#shape_read = (1,1,4)
+# shape_read = (1,1,)
 # brick_code = { 
-# (  0,   0,   0)  :   ['<Lo', '<Ro'], 
+# (  0,   0,   0)  :   ['<Lo', 'CU', 'oMUL', 'oMUR', '<Ro'], 
 # (  0,   0,   1)  :   ['<L', 'SUo', '<R', 'CII', '>L', 'SDo', '>R'], 
 # (  0,   0 ,  2)  :   ['<L', 'SUo', '<R', 'CII', '>L', 'SDo', '>R'], 
-# (  0,   0 ,  3)  :   ['>L', '>R'], 
+# (  0,   0 ,  3)  :   ['>Lo', '>Ro'], 
 # }
 # water_code = { 
 # (  0  , 0 ,  0)  :   [], 

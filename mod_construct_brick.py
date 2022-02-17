@@ -156,28 +156,24 @@ class Brick(object):
 
 		list_water = set( ["wDR", "wDR", "wIL", "wIR", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR"] )
 
-		list_water = set( ["wDR", "wDR", "wIL", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR"] )
+		#list_water = set( ["wDR", "wDR", "wIL", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR"] )
 
-		incompatibility = { "oMUL" : "wMUL",
-							"oMDL" : "wMDL",
-							"oMDR" : "wMDR",
-							"oMUR" : "wMUR",
-							"oDL" : "wDL",
-							"oDR" : "wDR",
-							"oUL" : "wUL",
-							"oXD" : "wXD",
-							"oXU" : "wXU",
+		incompatibility = { "oMUL" : ["wMUL"],
+							"oMDL" : ["wMDL"],
+							"oMDR" : ["wMDR"],
+							"oMUR" : ["wMUR"],
+							"oDL" : ["wDL"],
+							"oDR" : ["wDR"],
+							"oUL" : ["wUL"],
+							"oXD" : ["wXD"],
+							"oXU" : ["wXU"],
 
-							"SD"  : "wMDR",
-							"SDo" : "wMDR",
-							"SU"  : "wMUR",
-							"SUo" : "wMUR",
-
-							"SD"  : "wDR",
-							"SDo" : "wDR",
-							"SU"  : "wUL",
-							"SUo" : "wUL"
+							"SD"  : ["wMDR", "wDR"],
+							"SDo" : ["wMDR", "wDR"],
+							"SU"  : ["wMUR", "wUL"],
+							"SUo" : ["wMUR", "wUL"],
 		}
+
 
 		self.elegible_water = []
 
@@ -199,7 +195,8 @@ class Brick(object):
 				self.N_SUD += 1
 
 			if p in incompatibility:
-				self.excluded.add( incompatibility[p] )
+				for w in incompatibility[p]:
+					self.excluded.add( w )
 
 		self.elegible_water = np.array( list(list_water.difference(self.excluded) ) )
 
@@ -259,8 +256,7 @@ def below_layer():
 						for oh_bridge_2 in [ [None], ["oMDR"] ]:
 							comb = i_left + i_bridge + oh_bridge_1 + oh_bridge_2 + i_right
 
-							combs_below.append( [x for x in comb if x is not None] )
-							
+							combs_below.append( [x for x in comb if x is not None] )		
 
 	return combs_below
 
@@ -370,7 +366,6 @@ def get_all_bricks(pieces):
 				sorted_bricks[Ca_Si] = {Q: {SiOH: {CaOH: [b]} } }
 
 		ind += 1
-
 
 	return sorted_bricks
 

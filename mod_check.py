@@ -24,6 +24,8 @@ def check_SiOH_CaOH_MCL(sorted_bricks, widths, shape):
 	N_samples = 100
 	W_Si_ratio = 0.0
 
+	list_target_ratios = np.linspace(0.9, 2.0, 10)
+
 	list_target_ratios = [0.9, 1.0, 1.2, 1.4, 1.6, 1.8, 2.0, 2.1]
 	offset_SiOH = []
 	offset_CaOH = []

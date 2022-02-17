@@ -162,7 +162,7 @@ if read_structure:
 
 
 	if surface_separation:
-		entries_crystal, supercell = transform_surface_separation(entries_crystal, supercell, surface_separation)		
+		entries_crystal, supercell = transform_surface_separation(entries_crystal, supercell, unitcell, surface_separation)		
 
 	mypath = os.path.abspath(".")
 	path = os.path.join(mypath, "output/")

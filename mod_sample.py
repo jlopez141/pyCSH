@@ -15,7 +15,7 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, 
 	brick_SiOH = 0.0
 	brick_CaOH = 0.0
 
-	crystal = []
+	crystal= []#_rs = [ [ [ 0 for k in range(shape[2]) ] for j in range(shape[1]) ] for i in range(shape[0]) ]
 
 	N_Si = 0
 	N_Ca = 0
@@ -86,7 +86,7 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, 
 			else:
 				brick_Ca_Si = 0.0
 				brick_Q = 0.0
-				crystal = []
+				crystal = []#_rs = [ [ [ 0 for k in range(shape[2]) ] for j in range(shape[1]) ] for i in range(shape[0]) ]
 				N_Si = 0
 				N_Ca = 0
 				N_SiOH = 0
@@ -104,7 +104,7 @@ def sample_Ca_Si_ratio(sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, 
 		else:
 			brick_Ca_Si = 0.0
 			brick_Q = 0.0
-			crystal = []
+			crystal = []#_rs = [ [ [ 0 for k in range(shape[2]) ] for j in range(shape[1]) ] for i in range(shape[0]) ]
 			N_Si = 0
 			N_Ca = 0
 			N_SiOH = 0
