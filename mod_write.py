@@ -147,6 +147,89 @@ def get_vasp_input(name, entries_crystal, supercell):
 			f.write( fmt.format(*i) )
 
 
+def get_xyz_input(name, entries_crystal, supercell):
+
+	N_atoms_specie = np.zeros(6,dtype=int)
+
+	coords = [ [] for i in range(8) ]
+
+	coords_Ca = []
+	coords_Si = []
+	coords_O1 = []
+	#coords_O2 = []
+	coords_Ow = []
+	coords_Oh = []
+	coords_Hw = []
+	coords_H = []
+
+	for entry in entries_crystal:
+		specie = entry[1]
+		r = np.array( entry[3:] )
+
+		if specie == 1:
+			coords_Ca.append(r)
+			N_atoms_specie[0] += 1
+		elif specie == 2:
+			coords_Si.append(r)
+			N_atoms_specie[1] += 1
+		elif specie == 3:
+			coords_O1.append(r)
+			N_atoms_specie[2] += 1
+		elif specie == 5:
+			coords_Ow.append(r)
+			N_atoms_specie[3] += 1
+		elif specie == 6:
+			coords_O1.append(r)
+			N_atoms_specie[2] += 1
+		elif specie == 7:
+			coords_Hw.append(r)
+			N_atoms_specie[4] += 1
+		elif specie == 8:
+			coords_H.append(r)
+			N_atoms_specie[5] += 1
+
+		coords[  entry[1]-1 ].append( r )
+
+
+	together = True
+	if together:
+		coords_O1 = coords_O1 + coords_Ow
+		N_atoms_specie[2] += N_atoms_specie[3]
+		N_atoms_specie[3] = 0
+		coords_Ow = []
+
+		coords_H = coords_H + coords_Hw
+		N_atoms_specie[5] += N_atoms_specie[4]
+		N_atoms_specie[4] = 0
+		coords_Hw = []
+
+
+	#f.write( " \n" )
+	with open( name, "w" ) as f:
+		f.write( "{: 12d} \n".format(np.sum(N_atoms_specie)) )
+		fmt = "{:} {: 12.6f} {: 12.6f} {: 12.6f} \n"
+		
+		# for i in range(8):
+		# #for i in [4, 6]:
+		# 	for j in coords[i]:
+		# 		f.write( fmt.format(*j) )
+
+		for i in coords_Ca:
+			f.write( fmt.format("Ca", *i) )
+		for i in coords_Si:
+			f.write( fmt.format("Si", *i) )
+		for i in coords_O1:
+			f.write( fmt.format("O",*i) )
+		for i in coords_Ow:
+			f.write( fmt.format("O",*i) )
+		for i in coords_Oh:
+			f.write( fmt.format("O", *i) )
+		for i in coords_Hw:
+			f.write( fmt.format("H",*i) )
+		for i in coords_H:
+			f.write( fmt.format("H",*i) )
+
+
 def get_log(log_file, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL ):
 
 	N_Oh = 0

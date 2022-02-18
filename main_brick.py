@@ -178,6 +178,10 @@ if read_structure:
 	name = os.path.join(path, name)
 	get_vasp_input(name, entries_crystal, supercell)
 
+	name = "input_fromManualCode.xyz"
+	name = os.path.join(path, name)
+	get_xyz_input(name, entries_crystal, supercell)
+
 	name = "input_fromManualCode.fdf"
 	name = os.path.join(path, name)
 	get_siesta_input(name, entries_crystal, supercell)

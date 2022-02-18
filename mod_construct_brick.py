@@ -72,8 +72,14 @@ class Piece(object):
 
 
 				frac_r = np.matmul(r, cell_inv) + np.array([0.5, 0.5, 0.5])
+				for i in range(3):
+					if frac_r[i] > 1:
+						frac_r[i]-=1
+					if frac_r[i] < 0:
+						frac_r[i]+=1
 				r = np.matmul(frac_r, cell)
 				self.coord.append( r )
+
 
 
 pieces = { "<L"   : Piece( charge = -2, file = "<L"   ),
