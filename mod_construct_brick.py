@@ -168,6 +168,8 @@ class Brick(object):
 							"oXD" : ["wXD"],
 							"oXU" : ["wXU"],
 
+							"oUR" : ["wIR"],
+
 							"SD"  : ["wMDR", "wDR"],
 							"SDo" : ["wMDR", "wDR"],
 							"SU"  : ["wMUR", "wUL"],
