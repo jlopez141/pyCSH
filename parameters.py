@@ -3,11 +3,11 @@ shape = (2,2,2)   # Minimum (1,1,1)
 Ca_Si_ratio = 1.9
 W_Si_ratio  = 1.4
 
-N_samples = 200
+N_samples = 1
 make_independent = True
 
 
-offset_gaussian = True
+offset_gaussian = False
 width_Ca_Si = 0.05
 width_SiOH = 0.08
 width_CaOH = 0.04
@@ -16,8 +16,9 @@ create = True
 check = False
 
 
-write_lammps = False
-write_vasp = True
+write_lammps = True
+write_lammps_erica = True
+write_vasp = False
 write_siesta = False
 
 

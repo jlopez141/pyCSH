@@ -35,6 +35,9 @@ except NameError: check = False
 try: write_lammps
 except NameError: write_lammps = True
 
+try: write_lammps_erica
+except NameError: write_lammps_erica = True
+
 try: write_vasp
 except NameError: write_vasp = False
 
@@ -121,7 +124,7 @@ if create:
 			entries_angle = get_angles(crystal_dict, water_dict, shape)
 
 			write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
-					 	  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta)
+					 	  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta)
 
 
 	list_properties = np.array(list_properties)	
