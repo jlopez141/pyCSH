@@ -1,7 +1,7 @@
 seed = 1123
 shape = (2,2,2)   # Minimum (1,1,1)
-Ca_Si_ratio = 1.7
-W_Si_ratio  = 1.0
+Ca_Si_ratio = 1.9
+W_Si_ratio  = 1.4
 
 N_samples = 200
 make_independent = True

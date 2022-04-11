@@ -140,6 +140,10 @@ pieces = { "<L"   : Piece( charge = -2, file = "<L"   ),
 		   "wMDR" : Piece( charge = 0,  file = "wMDR"),
 		   "wMUR" : Piece( charge = 0,  file = "wMUR"),
 
+		   "w14" : Piece( charge = 0,  file = "w14"),
+		   "w15" : Piece( charge = 0,  file = "w15"),
+		   "w16" : Piece( charge = 0,  file = "w16"),
+
 }
 
 
@@ -160,7 +164,7 @@ class Brick(object):
 		self.N_SUD = 0
 		self.N_braket = 0
 
-		list_water = set( ["wDR", "wDR", "wIL", "wIR", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR"] )
+		list_water = set( ["wDR", "wDR", "wIL", "wIR", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR", "w14", "w15", "w16"] )
 
 		#list_water = set( ["wDR", "wDR", "wIL", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR"] )
 
