@@ -228,7 +228,7 @@ def get_angles(crystal_dict, water_dict, shape):
 			if piece == "<Ro":
 				ind_Oh  = crystal_dict[cell][piece][6][0]
 				angle_entries.append( [angle_index, 3, ind_Si, ind_Oh, ind_Oh+1] )
-			angle_index += 1
+				angle_index += 1
 
 
 

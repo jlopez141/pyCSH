@@ -3,7 +3,7 @@ import os
 
 
 
-def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, supercell):
+def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, supercell, write_lammps_erica):
 
 	N_atom = len(entries_crystal)
 	N_bond = len(entries_bonds)
@@ -37,8 +37,19 @@ def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, 
 		f.write( "Atoms \n" )
 		f.write( " \n" )
 		fmt = "{: 8d} {: 8d} {: 8d} {: 8.3f} {: 12.6f} {: 12.6f} {: 12.6f}\n"
+		molID = 2
+		CS_info = []
 		for i in entries_crystal:
-			f.write( fmt.format(i[0], 1, *i[1:]) )
+			if i[1] == 3:
+				f.write( fmt.format(i[0], molID, *i[1:]) )
+				CS_info.append( [i[0], molID] )
+			elif i[1] == 4:
+				f.write( fmt.format(i[0], molID, *i[1:]) )
+				CS_info.append( [i[0], molID] )
+				molID += 1
+			else:
+				f.write( fmt.format(i[0], 1, *i[1:]) )
+				CS_info.append( [i[0], 1] )
 		f.write( " \n" )
 
 		f.write( "Bonds \n" )
@@ -53,8 +64,14 @@ def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, 
 		fmt = "{: 8d} {: 8d} {: 8d} {: 8d} {: 8d} \n"
 		for i in entries_angle:
 			f.write( fmt.format(*i) )
+		f.write( " \n" )
 
-
+		f.write( "CS-Info \n" )
+		f.write( " \n" )
+		fmt = "{: 8d} {: 8d} \n"
+		if write_lammps_erica:
+			for i in CS_info:
+				f.write( fmt.format(*i))
 
 
 
@@ -429,15 +446,15 @@ def get_sorted_log(list_properties):
 
 
 def write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
-				  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_vasp, write_siesta):
+				  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta):
 
 	mypath = os.path.abspath(".")
 	path = os.path.join(mypath, "output/")
 
-	if write_lammps:
+	if write_lammps or write_lammps_erica:
 		name = "input"+str(isample+1)+".data"
 		name = os.path.join(path, name)
-		get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell) 
+		get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell, write_lammps_erica) 
 
 	name = "input"+str(isample+1)+".log"
 	name = os.path.join(path, name)
