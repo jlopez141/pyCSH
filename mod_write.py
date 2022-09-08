@@ -114,6 +114,7 @@ def get_vasp_input(name, entries_crystal, supercell):
 		N_atoms_specie[4] = 0
 		coords_Hw = []
 
+	#print(np.sum(N_atoms_specie))
 
 	#f.write( " \n" )
 	with open( name, "w" ) as f:

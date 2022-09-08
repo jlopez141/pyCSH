@@ -3,7 +3,7 @@ import ast
 
 class Piece(object):
 	"""docstring for Piece"""
-	def __init__(self, charge, file):
+	def __init__(self, charge, file, random_water=True):
 		super(Piece, self).__init__()
 		self.charge = charge
 		self.N_Ca = 0
@@ -50,15 +50,29 @@ class Piece(object):
 					self.species.append( 5 )
 					self.N_Ow += 1
 
-					if r[2] > 0.0:
-						self.r_H1 = np.array([0, 0, -1.0])
-					else:
-						self.r_H1 = np.array([0, 0, 1.0])
+					if random_water:
+						u = np.random.rand(3)
+						u = u/np.linalg.norm(u)
 
-					if r[1] > 0.0:
-						self.r_H2 = np.array([0, -1.0, 0])
+						v = np.random.rand(3)
+						v = v/np.linalg.norm(v)
+
+						v[2] = (np.cos(104*np.pi/180) - u[0]*v[0] - u[1]*v[1])/u[2]
+						v = v/np.linalg.norm(v)
+
+						self.r_H1 = u
+						self.r_H2 = v
+
 					else:
-						self.r_H2 = np.array([0, 1.0, 0])
+						if r[2] > 0.0:
+							self.r_H1 = np.array([0, 0, -1.0])
+						else:
+							self.r_H1 = np.array([0, 0, 1.0])
+
+						if r[1] > 0.0:
+							self.r_H2 = np.array([0, -1.0, 0])
+						else:
+							self.r_H2 = np.array([0, 1.0, 0])
 
 				if specie == "Oh" : 
 					self.species.append( 6 )

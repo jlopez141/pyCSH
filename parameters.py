@@ -1,14 +1,16 @@
 seed = 1123
-shape = (2,2,2)   # Minimum (1,1,1)
-Ca_Si_ratio = 1.7
-W_Si_ratio  = 1.0
+shape = (2,2,1)   # Minimum (1,1,1)
+Ca_Si_ratio = 1.25
+W_Si_ratio  = 0.8
 
-N_samples = 200
+N_samples = 50
 make_independent = True
+
+random_water = True
 
 
 offset_gaussian = True
-width_Ca_Si = 0.05
+width_Ca_Si = 0.1
 width_SiOH = 0.08
 width_CaOH = 0.04
 
@@ -16,7 +18,7 @@ create = True
 check = False
 
 
-write_lammps = False
+write_lammps = True
 write_vasp = True
 write_siesta = False
 
@@ -36,29 +38,14 @@ surface_from_bulk = False
 surface_separation = False
 
 
-shape_read = (2,2,2)
+shape_read = (1, 1, 1)
 brick_code = { 
-(  0,   0,   0)  :   ['<L', 'CU', 'oMUL', 'oMUR', '<R', 'CII', 'XU', 'XD', 'CIU', 'oDL', 'oXU', 'oXD', '>L', 'SD', '>R'], 
-(  0,   0,   1)  :   ['<Lo', 'CU', 'oMUL', 'oMUR', '<Ro', 'CII', 'XU', 'XD', 'oDL', 'oUL', 'oXU', 'oXD', '>L', 'SD', '>R'], 
-(  0,   1,   0)  :   ['<L', 'CU', '<R', 'XU', 'oUL', 'oXU', '>L', 'CD', 'oMDL', '>R'], 
-(  0,   1,   1)  :   ['<L', 'SU', '<R', 'XU', 'XD', 'CID', 'oDR', 'oUR', 'oXU', 'oXD', '>L', 'CD', 'oMDL', 'oMDR', '>Ro'], 
-(  1,   0,   0)  :   ['<L', 'SU', '<R', 'CII', 'XU', 'CID', 'CIU', 'oDL', 'oXU', '>L', '>R'], 
-(  1,   0,   1)  :   ['<L', 'SU', '<R', 'CII', 'XU', 'XD', 'CIU', 'oDL', 'oDR', 'oUR', 'oXU', 'oXD', '>L', 'CD', 'oMDL', 'oMDR', '>R'], 
-(  1,   1,   0)  :   ['<L', 'CU', 'oMUR', '<R', 'XU', 'oXU', '>L', 'CD', 'oMDL', '>R'], 
-(  1,   1,   1)  :   ['<L', 'SU', 'oMUL', '<R', 'CII', 'XU', 'XD', 'CID', 'oDR', 'oXU', 'oXD', '>L', 'CD', 'oMDR', '>R'], 
+(  0,   0,   0)  :   ['<Lo', 'CU', 'oMUL', 'oMUR', '<Ro', 'CII', 'XU', 'XD', 'oDL', 'oUL', 'oXU', 'oXD', '>L', 'SD', '>R'],
 }
 
 water_code = { 
-(  0,   0,  0)  :   ['wIL', 'wUL', 'wIR2', 'wIR', 'wMDL'], 
-(  0,   0,  1)  :   ['wMDL', 'wIR2', 'wIL', 'wIR'], 
-(  0,   1,  0)  :   ['wIR', 'wXD', 'wMUR', 'wIR2', 'wMUL', 'wDR', 'wIL'], 
-(  0,   1,  1)  :   ['wIR2', 'wMUL', 'wIL'], 
-(  1,   0,  0)  :   ['wMUL', 'wIR2', 'wXD', 'wIL', 'wIR', 'wDR'], 
-(  1,   0,  1)  :   ['wIR2', 'wMUL', 'wIL'], 
-(  1,   1,  0)  :   ['wUL', 'wMDR', 'wIL', 'wIR', 'wIR2', 'wXD'], 
-(  1,   1,  1)  :   ['wIR2', 'wMDL', 'wIL', 'wIR'], 
+(  0,   0,  0)  :   [], 
 }
- 
 
 # shape_read = (1,1,)
 # brick_code = { 
