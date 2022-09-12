@@ -123,6 +123,9 @@ if create:
 
 			entries_angle = get_angles(crystal_dict, water_dict, shape)
 
+			# Water molecule overlap
+			entries_crystal, N_not_ok = check_move_water_hydrogens(entries_crystal)
+
 			write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
 					 	  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta)
 
@@ -153,6 +156,8 @@ if read_structure:
 
 	entries_angle = get_angles(crystal_dict, water_dict, shape)
 
+	entries_crystal, N_not_ok = check_move_water_hydrogens(entries_crystal)
+
 
 
 	unitcell = np.array([ [6.7352,    0.0 ,      0.0],
@@ -172,7 +177,7 @@ if read_structure:
 
 	name = "input_fromManualCode.data"
 	name = os.path.join(path, name)
-	get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell) 
+	get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell, write_lammps_erica) 
 	name = "input_fromManualCode.log"
 	name = os.path.join(path, name)
 	get_log(name, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL )

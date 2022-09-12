@@ -376,6 +376,93 @@ def transform_surface_separation(crystal_entries, supercell, unitcell, surface_s
 	return new_entries, supercell
 
 
+def check_move_water_hydrogens(crystal_entries):
+	aux_entries = crystal_entries# np.array(crystal_entries)
+	# List of Hw and H
+	list_Hw = []
+	list_Ow = []
+	list_oH = []
+	for i in range(len(aux_entries)):
+		# If Ow
+		if int(aux_entries[i][1]) == 5:
+			list_Ow.append(i)
+		# If Hw
+		if int(aux_entries[i][1]) == 7:
+			list_Hw.append(i)
+		# If Ho
+		if int(aux_entries[i][1]) == 8:
+			list_oH.append(i)
+
+	N_water = len(list_Ow)
+	N_not_ok = 0
+	for iwater in range(len(list_Ow)):
+		# Check distance of the Hw in the molecule to every other H
+		ok_struc = False
+		for i in range(500):
+			#print(iwater, i)
+			ok_molecule = check_new_molecule(iwater, list_Hw, list_Ow, list_oH, aux_entries, min_dist=0.8)
+			if ok_molecule:
+				ok_struc = True
+				break
+			else:
+				# Change the coordinates of the new molecule
+				new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries)
+
+		if not ok_struc: N_not_ok += 1
+
+	return aux_entries, N_not_ok
+
+
+def new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries):
+
+	iHw1 = list_Hw[2*iwater]
+	iHw2 = list_Hw[2*iwater+1]
+
+	u = np.random.rand(3)
+	u = u/np.linalg.norm(u)
+
+	v = np.random.rand(3)
+	v = v/np.linalg.norm(v)
+
+	v[2] = (np.cos(104*np.pi/180) - u[0]*v[0] - u[1]*v[1])/u[2]
+	v = v/np.linalg.norm(v)
+
+	aux_entries[iHw1][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + u
+	aux_entries[iHw2][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + v
+
+
+def check_new_molecule(iwater, list_Hw, list_Ow, list_oH, aux_entries, min_dist=0.7):
+	# Check distance wrt Oh
+	for iH in range(len(list_oH)):
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+		dist = np.linalg.norm( np.array(aux_entries[list_oH[iH]][3:]) - np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist:
+			return False
+		iHw = 2*iwater + 1
+		iHw = list_Hw[iHw]
+		dist = np.linalg.norm( np.array(aux_entries[list_oH[iH]][3:]) - np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist:
+			return False
+
+	# Check distance wrh previous water molecules
+	for iw in range(2*(iwater-1)):
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+		dist = np.linalg.norm( np.array(aux_entries[list_Hw[iw]][3:]) - np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist:
+			return False
+		iHw = 2*iwater + 1
+		iHw = list_Hw[iHw]
+		dist = np.linalg.norm( np.array(aux_entries[list_Hw[iw]][3:]) - np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist:
+			return False
+
+	return True
+
+
+
+
 # def transform_surface_separation(crystal_entries, supercell, unitcell, surface_separation):
 
 # 	vec_a = supercell[0,:]

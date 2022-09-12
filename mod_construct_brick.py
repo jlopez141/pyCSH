@@ -140,23 +140,23 @@ pieces = { "<L"   : Piece( charge = -2, file = "<L"   ),
 		   "oMUR" : Piece( charge = -1, file = "oMUR"),
                                                              
                                                              
-		   "wDR"  : Piece( charge = 0,  file = "wDR" ),
-		   "wDL"  : Piece( charge = 0,  file = "wDL" ),
-		   "wIL"  : Piece( charge = 0,  file = "wIL" ),
-		   "wIR"  : Piece( charge = 0,  file = "wIR" ),
-		   "wIR2" : Piece( charge = 0,  file = "wIR2"),
-		   "wUL"  : Piece( charge = 0,  file = "wUL" ),
-		   "wXD"  : Piece( charge = 0,  file = "wXD" ),
-		   "wXU"  : Piece( charge = 0,  file = "wXU" ),
+		   "wDR"  : Piece( charge = 0,  file = "wDR" , random_water = True),
+		   "wDL"  : Piece( charge = 0,  file = "wDL" , random_water = True),
+		   "wIL"  : Piece( charge = 0,  file = "wIL" , random_water = True),
+		   "wIR"  : Piece( charge = 0,  file = "wIR" , random_water = True),
+		   "wIR2" : Piece( charge = 0,  file = "wIR2", random_water = True),
+		   "wUL"  : Piece( charge = 0,  file = "wUL" , random_water = True),
+		   "wXD"  : Piece( charge = 0,  file = "wXD" , random_water = True),
+		   "wXU"  : Piece( charge = 0,  file = "wXU" , random_water = True),
                                                              
-		   "wMDL" : Piece( charge = 0,  file = "wMDL"),
-		   "wMUL" : Piece( charge = 0,  file = "wMUL"),
-		   "wMDR" : Piece( charge = 0,  file = "wMDR"),
-		   "wMUR" : Piece( charge = 0,  file = "wMUR"),
+		   "wMDL" : Piece( charge = 0,  file = "wMDL", random_water = True),
+		   "wMUL" : Piece( charge = 0,  file = "wMUL", random_water = True),
+		   "wMDR" : Piece( charge = 0,  file = "wMDR", random_water = True),
+		   "wMUR" : Piece( charge = 0,  file = "wMUR", random_water = True),
 
-		   "w14" : Piece( charge = 0,  file = "w14"),
-		   "w15" : Piece( charge = 0,  file = "w15"),
-		   "w16" : Piece( charge = 0,  file = "w16"),
+		   "w14" : Piece( charge = 0,  file = "w14",   random_water = True),
+		   "w15" : Piece( charge = 0,  file = "w15",   random_water = True),
+		   "w16" : Piece( charge = 0,  file = "w16",   random_water = True),
 
 }
 
