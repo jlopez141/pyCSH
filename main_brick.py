@@ -50,12 +50,15 @@ except NameError: read_structure = False
 try: surface_separation
 except NameError: surface_separation = False
 
+try: prefix
+except NameError: prefix = "input"
+
 
 
 widths = [width_Ca_Si, width_SiOH, width_CaOH]
 
-
 np.random.seed(seed)
+random.seed(seed+10)
 
 
 
@@ -64,6 +67,13 @@ np.random.seed(seed)
 if create or check:
 	# Get all possible bricks
 	sorted_bricks = get_all_bricks(pieces)
+
+	# for CaSi in sorted_bricks:
+	# 	if 0 in sorted_bricks[CaSi]:
+	# 		for Si in sorted_bricks[CaSi][0]:
+	# 			for Ca in sorted_bricks[CaSi][0][Si]:
+	# 				print(CaSi, Si, Ca, len(sorted_bricks[CaSi][0][Si][Ca]))
+	# 	print()
 
 
 if create or read_structure:
@@ -97,7 +107,7 @@ if create:
 	cont = 0
 
 
-
+	jsample = 0
 	for isample in range(N_samples):
 		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_2H_Si = sample_Ca_Si_ratio(
 													sorted_bricks, Ca_Si_ratio, W_Si_ratio, N_brick, widths, offset=offset )
@@ -115,7 +125,7 @@ if create:
 			list_crystals.append(crystal_index)
 
 		if new:
-			list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, isample+1, r_2H_Si] )
+			list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, jsample+1, r_2H_Si] )
 
 			water_in_crystal = fill_water(crystal, N_water = N_water)
 			crystal_rs, water_in_crystal_rs =  reshape_crystal(crystal, water_in_crystal, shape)
@@ -126,8 +136,11 @@ if create:
 			# Water molecule overlap
 			entries_crystal, N_not_ok = check_move_water_hydrogens(entries_crystal)
 
-			write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
-					 	  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta)
+			write_output( jsample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
+					 	  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta,
+					 	  prefix)
+
+			jsample += 1
 
 
 	list_properties = np.array(list_properties)	
@@ -175,21 +188,21 @@ if read_structure:
 	mypath = os.path.abspath(".")
 	path = os.path.join(mypath, "output/")
 
-	name = "input_fromManualCode.data"
+	name = prefix+"_fromManualCode.data"
 	name = os.path.join(path, name)
 	get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell, write_lammps_erica) 
-	name = "input_fromManualCode.log"
+	name = prefix+"_fromManualCode.log"
 	name = os.path.join(path, name)
 	get_log(name, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL )
 
-	name = "input_fromManualCode.vasp"
+	name = prefix+"_fromManualCode.vasp"
 	name = os.path.join(path, name)
 	get_vasp_input(name, entries_crystal, supercell)
 
-	name = "input_fromManualCode.xyz"
+	name = prefix+"_fromManualCode.xyz"
 	name = os.path.join(path, name)
 	get_xyz_input(name, entries_crystal, supercell)
 
-	name = "input_fromManualCode.fdf"
+	name = prefix+"_fromManualCode.fdf"
 	name = os.path.join(path, name)
 	get_siesta_input(name, entries_crystal, supercell)

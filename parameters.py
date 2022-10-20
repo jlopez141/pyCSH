@@ -1,24 +1,26 @@
-seed = 1123
-shape = (2,2,2)   # Minimum (1,1,1)
-Ca_Si_ratio = 2.1
-W_Si_ratio  = 1.4
+seed = 23
+shape = (3,3,2)   # Minimum (1,1,1)
+Ca_Si_ratio = 1.5
+W_Si_ratio  = 1.0
 
-N_samples = 10
+prefix = "CaSi1.5"
+
+N_samples = 20
 make_independent = True
 
 
 offset_gaussian = False
-width_Ca_Si = 0.05
-width_SiOH = 0.08
-width_CaOH = 0.04
+width_Ca_Si = 0.01
+width_SiOH = 0.05
+width_CaOH = 0.05
 
 create = True
 check = False
 
 
 write_lammps = False
-write_lammps_erica = False
-write_vasp = True
+write_lammps_erica = True
+write_vasp = False
 write_siesta = False
 
 

@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import ast
 
 class Piece(object):
@@ -361,6 +362,9 @@ def get_all_bricks(pieces):
 
 				if check_restrictions(comb):
 					combs.append(comb)
+
+	random.shuffle(combs)
+
 
 	sorted_bricks = {}
 

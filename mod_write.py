@@ -27,8 +27,8 @@ def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, 
 		f.write( " \n" )
 		f.write( "1 40.08  #Ca  \n" )
 		f.write( "2 28.10  #Si \n" )
-		f.write( "3 15.79  #O \n" )
-		f.write( "4 0.20   #O(S) \n" )
+		f.write( "3 15.59  #O \n" )
+		f.write( "4 0.40   #O(S) \n" )
 		f.write( "5 16.00  #Ow \n" )
 		f.write( "6 16.00  #Oh \n" )
 		f.write( "7 1.00   #Hw \n" )
@@ -66,12 +66,106 @@ def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, 
 			f.write( fmt.format(*i) )
 		f.write( " \n" )
 
-		f.write( "CS-Info \n" )
 		f.write( " \n" )
 		fmt = "{: 8d} {: 8d} \n"
 		if write_lammps_erica:
+			f.write( "CS-Info \n" )
 			for i in CS_info:
 				f.write( fmt.format(*i))
+
+
+
+def get_lammps_input_reaxfff(name, entries_crystal, supercell):
+
+	N_atoms_specie = np.zeros(6,dtype=int)
+
+	coords = [ [] for i in range(8) ]
+
+	coords_Ca = []
+	coords_Si = []
+	coords_O1 = []
+	coords_Ow = []
+	coords_Oh = []
+	coords_Hw = []
+	coords_H = []
+
+	for entry in entries_crystal:
+		specie = entry[1]
+		r = np.array( entry[3:] )
+
+		if specie == 1:
+			coords_Ca.append(r)
+			N_atoms_specie[0] += 1
+		elif specie == 2:
+			coords_Si.append(r)
+			N_atoms_specie[1] += 1
+		elif specie == 3:
+			coords_O1.append(r)
+			N_atoms_specie[2] += 1
+		elif specie == 5:
+			coords_Ow.append(r)
+			N_atoms_specie[3] += 1
+		elif specie == 6:
+			coords_O1.append(r)
+			N_atoms_specie[2] += 1
+		elif specie == 7:
+			coords_Hw.append(r)
+			N_atoms_specie[4] += 1
+		elif specie == 8:
+			coords_H.append(r)
+			N_atoms_specie[5] += 1
+
+		coords[  entry[1]-1 ].append( r )
+
+
+	together = True
+	if together:
+		coords_O1 = coords_O1 + coords_Ow
+		N_atoms_specie[2] += N_atoms_specie[3]
+		N_atoms_specie[3] = 0
+		coords_Ow = []
+
+		coords_H = coords_H + coords_Hw
+		N_atoms_specie[5] += N_atoms_specie[4]
+		N_atoms_specie[4] = 0
+		coords_Hw = []
+
+	with open( name, "w" ) as f:
+		f.write( "Generated with Brickcode \n\n" )
+		f.write( "{: 8d} atoms \n".format(np.sum(N_atoms_specie)) )
+		f.write( "{: 8d} atom types \n".format(4) )
+		f.write( " \n" )
+		f.write( "{: 12.6f} {: 12.6f} xlo xhi \n".format(0.0, supercell[0,0]) )
+		f.write( "{: 12.6f} {: 12.6f} ylo yhi \n".format(0.0, supercell[1,1]) )
+		f.write( "{: 12.6f} {: 12.6f} zlo zhi \n".format(0.0, supercell[2,2]) )
+		f.write( "{: 12.6f} {: 12.6f} {: 12.6f} xy xz yz \n".format( supercell[1,0], supercell[2,0], supercell[2,1] ) )
+		f.write( " \n" )
+		f.write( "Masses \n" )
+		f.write( " \n" )
+		f.write( "1 40.08  #Ca  \n" )
+		f.write( "2 28.10  #Si \n" )
+		f.write( "3 15.79  #O \n" )
+		f.write( "4 1.00   #H \n" )
+		f.write( " \n" )
+		f.write( "Atoms \n" )
+		f.write( " \n" )
+		fmt = "{: 8d} {: 8d} {: 8d} {: 12.6f} {: 12.6f} {: 12.6f}\n"
+
+		cont = 1
+		for i in coords_Ca:
+			f.write( fmt.format(cont, 1, 0, *i) )
+			cont += 1
+		for i in coords_Si:
+			f.write( fmt.format(cont, 2, 0, *i) )
+			cont += 1
+		for i in coords_O1:
+			f.write( fmt.format(cont, 3, 0, *i) )
+			cont += 1
+		for i in coords_H:
+			f.write( fmt.format(cont, 4, 0, *i) )
+			cont += 1
+
+
 
 
 
@@ -446,26 +540,33 @@ def get_sorted_log(list_properties):
 
 
 def write_output( isample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
-				  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta):
+				  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta,
+				  prefix):
 
 	mypath = os.path.abspath(".")
 	path = os.path.join(mypath, "output/")
 
 	if write_lammps or write_lammps_erica:
-		name = "input"+str(isample+1)+".data"
+		name = prefix+"_"+str(isample+1)+".data"
 		name = os.path.join(path, name)
 		get_lammps_input(name, entries_crystal, entries_bonds, entries_angle, supercell, write_lammps_erica) 
+	
+	if write_lammps:
+		name = prefix+"_reax"+str(isample+1)+".data"
+		name = os.path.join(path, name)
+		get_lammps_input_reaxfff(name, entries_crystal, supercell)
 
-	name = "input"+str(isample+1)+".log"
+
+	name = prefix+"_"+str(isample+1)+".log"
 	name = os.path.join(path, name)
 	get_log(name, shape, crystal_rs, water_in_crystal_rs, N_Ca, N_Si, r_SiOH, r_CaOH, MCL )
 
 	if write_vasp:
-		name = "input"+str(isample+1)+".vasp"
+		name = prefix+"_"+str(isample+1)+".vasp"
 		name = os.path.join(path, name)
 		get_vasp_input(name, entries_crystal, supercell)
 
 	if write_siesta:
-		name = "input"+str(isample+1)+".fdf"
+		name = prefix+"_"+str(isample+1)+".fdf"
 		name = os.path.join(path, name)
 		get_siesta_input(name, entries_crystal, supercell)
