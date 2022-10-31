@@ -1,4 +1,4 @@
-seed = 23
+seed = 11
 shape = (3,3,2)   # Minimum (1,1,1)
 Ca_Si_ratio = 1.5
 W_Si_ratio  = 1.0
@@ -20,7 +20,7 @@ check = False
 
 write_lammps = False
 write_lammps_erica = True
-write_vasp = False
+write_vasp = True
 write_siesta = False
 
 

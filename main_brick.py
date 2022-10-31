@@ -5,6 +5,7 @@ from mod_write import *
 from mod_check import *
 from parameters import *
 from mod_make_graphs import *
+import time
 
 
 # Check input parameters:
@@ -107,6 +108,7 @@ if create:
 	cont = 0
 
 
+	t = time.time()
 	jsample = 0
 	for isample in range(N_samples):
 		crystal, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, N_water, r_2H_Si = sample_Ca_Si_ratio(
@@ -128,13 +130,20 @@ if create:
 			list_properties.append( [N_Ca/N_Si, r_SiOH, r_CaOH, MCL, jsample+1, r_2H_Si] )
 
 			water_in_crystal = fill_water(crystal, N_water = N_water)
+
 			crystal_rs, water_in_crystal_rs =  reshape_crystal(crystal, water_in_crystal, shape)
 			entries_crystal, entries_bonds, crystal_dict, water_dict = get_full_coordinates( crystal_rs, water_in_crystal_rs, shape, pieces )
 
 			entries_angle = get_angles(crystal_dict, water_dict, shape)
 
 			# Water molecule overlap
-			entries_crystal, N_not_ok = check_move_water_hydrogens(entries_crystal)
+			entries_crystal, N_not_ok, itry = check_move_water_hydrogens(entries_crystal)
+			
+			if N_not_ok != 0:
+				print("Warning: structure {: 5d} contains {: 5d} wrong water molecules".format(jsample, N_not_ok))
+			else:
+				print("Structure {: 5d} converged after {: 5d} iterations".format(jsample, itry))
+
 
 			write_output( jsample, entries_crystal, entries_bonds, entries_angle, shape, crystal_rs, water_in_crystal_rs,
 					 	  supercell, N_Ca, N_Si, r_SiOH, r_CaOH, MCL, write_lammps, write_lammps_erica, write_vasp, write_siesta,
@@ -142,6 +151,7 @@ if create:
 
 			jsample += 1
 
+	print("Generation completed in {: 12.6f} s".format(time.time()-t))
 
 	list_properties = np.array(list_properties)	
 	plot_XOH_X(list_properties)

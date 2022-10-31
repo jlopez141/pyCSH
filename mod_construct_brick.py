@@ -225,7 +225,7 @@ class Brick(object):
 				for w in incompatibility[p]:
 					self.excluded.add( w )
 
-		self.elegible_water = np.array( list(list_water.difference(self.excluded) ) )
+		self.elegible_water = np.array( sorted(list(list_water.difference(self.excluded) )) )
 
 
 

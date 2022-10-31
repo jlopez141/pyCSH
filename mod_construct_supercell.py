@@ -382,10 +382,14 @@ def check_move_water_hydrogens(crystal_entries):
 	list_Hw = []
 	list_Ow = []
 	list_oH = []
+	list_O  = []
 	for i in range(len(aux_entries)):
 		# If Ow
 		if int(aux_entries[i][1]) == 5:
 			list_Ow.append(i)
+		# If O
+		if int(aux_entries[i][1]) == 3 or int(aux_entries[i][1]) == 6:
+			list_O.append(i)
 		# If Hw
 		if int(aux_entries[i][1]) == 7:
 			list_Hw.append(i)
@@ -395,22 +399,52 @@ def check_move_water_hydrogens(crystal_entries):
 
 	N_water = len(list_Ow)
 	N_not_ok = 0
-	for iwater in range(len(list_Ow)):
-		# Check distance of the Hw in the molecule to every other H
-		ok_struc = False
-		for i in range(500):
-			#print(iwater, i)
-			ok_molecule = check_new_molecule(iwater, list_Hw, list_Ow, list_oH, aux_entries, min_dist=0.8)
-			if ok_molecule:
-				ok_struc = True
-				break
-			else:
-				# Change the coordinates of the new molecule
-				new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries)
 
-		if not ok_struc: N_not_ok += 1
+	for itry in range(10):
+		N_not_ok = 0
+		for iwater in range(len(list_Ow)):
+			# Check distance of the Hw in the molecule to every other H
+			ok_struc = False
+			new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries)
+			for i in range(100):
+				#print(iwater, i)
+				ok_molecule = check_new_molecule(iwater, list_Hw, list_Ow, list_oH, list_O, aux_entries,
+					                             min_dist_H=0.8, min_dist_O=0.7)
+				if ok_molecule:
+					ok_struc = True
+					break
+				else:
+					# Change the coordinates of the new molecule
+					#print("change molecule", iwater)
+					new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries)
 
-	return aux_entries, N_not_ok
+			if not ok_struc: N_not_ok += 1
+
+		if ok_struc:
+			N_not_ok = 0
+			itry += 1
+			break
+
+	return aux_entries, N_not_ok, itry
+
+
+# def new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries):
+
+# 	iHw1 = list_Hw[2*iwater]
+# 	iHw2 = list_Hw[2*iwater+1]
+
+# 	u = np.random.rand(3)-0.5
+# 	u = u/np.linalg.norm(u)
+
+# 	v = np.random.rand(3)-0.5
+# 	v = v/np.linalg.norm(v)
+
+# 	v[2] = (np.cos(107*np.pi/180) - u[0]*v[0] - u[1]*v[1])/u[2]
+# 	v = v/np.linalg.norm(v)
+
+# 	aux_entries[iHw1][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + u
+# 	aux_entries[iHw2][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + v
+
 
 
 def new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries):
@@ -418,48 +452,194 @@ def new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries):
 	iHw1 = list_Hw[2*iwater]
 	iHw2 = list_Hw[2*iwater+1]
 
-	u = np.random.rand(3)
-	u = u/np.linalg.norm(u)
-
-	v = np.random.rand(3)
-	v = v/np.linalg.norm(v)
-
-	v[2] = (np.cos(104*np.pi/180) - u[0]*v[0] - u[1]*v[1])/u[2]
-	v = v/np.linalg.norm(v)
-
-	aux_entries[iHw1][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + u
-	aux_entries[iHw2][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + v
+	r_H1 = np.random.rand(3)-0.5
+	r_H1 = r_H1/np.linalg.norm(r_H1)
 
 
-def check_new_molecule(iwater, list_Hw, list_Ow, list_oH, aux_entries, min_dist=0.7):
+	# Second water molecule
+	# In the reference system where Z' axis is oriented in the direction 
+	# that joins the Oxygen and H1 atoms, and Oxygen is the origin
+	# x'**2 + y'**2 = cos(104-90)**2
+	# z' = -sin(104-90)
+	# x' and y' are randomly chosen in that circunference
+	ang = np.random.rand()*2*np.pi
+	x_p = np.cos(14.5*np.pi/180)*np.sin(ang)
+	y_p = np.cos(14.5*np.pi/180)*np.cos(ang)
+	z_p = -np.sin(14.5*np.pi/180)
+
+	r_H2_p = np.array([x_p, y_p, z_p])
+
+
+	# Now we have to rotate that vector to the original cartesian reference
+	theta = np.arccos( r_H1[2]/np.linalg.norm(r_H1) )
+	u_rot = np.cross(np.array([0,0,1]), r_H1)
+	u_rot = u_rot/np.linalg.norm(u_rot)
+
+	mat_rot = np.zeros((3,3))
+	mat_rot[0,0] = np.cos(theta) + u_rot[0]**2*(1-np.cos(theta))
+	mat_rot[1,1] = np.cos(theta) + u_rot[1]**2*(1-np.cos(theta))
+	mat_rot[2,2] = np.cos(theta)
+	mat_rot[0,1] = u_rot[0]*u_rot[1]*(1-np.cos(theta))
+	mat_rot[0,2] = u_rot[1]*np.sin(theta)
+	mat_rot[1,2] = -u_rot[0]*np.sin(theta)
+
+	mat_rot[1,0] = mat_rot[0,1]
+	mat_rot[2,0] = -mat_rot[0,2]
+	mat_rot[2,1] = -mat_rot[1,2]
+
+	r_H2 = np.dot(mat_rot, r_H2_p)
+
+	# Finaly we change the origin from the Oxygen to the cartesian center
+
+	aux_entries[iHw1][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + r_H1
+	aux_entries[iHw2][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + r_H2
+
+
+
+
+
+def check_new_molecule(iwater, list_Hw, list_Ow, list_oH, list_O, aux_entries, min_dist_H=0.8, min_dist_O=1.0):
+	# Check distance wrt Oh
+	aux = np.zeros((0,3),dtype=float)
+	for iH in range(len(list_oH)):
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+		aux = np.concatenate(( aux, [np.array(aux_entries[list_oH[iH]][3:]) - np.array(aux_entries[iHw][3:])] ))
+
+
+		iHw = 2*iwater + 1
+		iHw = list_Hw[iHw]
+		aux = np.concatenate(( aux, [np.array(aux_entries[list_oH[iH]][3:]) - np.array(aux_entries[iHw][3:])] ))
+
+	dist = check_distance_PBC(aux)
+	if np.any( dist < min_dist_H ):
+		return False
+
+	# Check distance wrt previous water molecules
+	aux = np.zeros((0,3),dtype=float)
+	for iw in range(2*(iwater-1)):
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+
+		aux = np.concatenate(( aux, [np.array(aux_entries[list_Hw[iw]][3:]) - np.array(aux_entries[iHw][3:])] ))
+
+
+		iHw = 2*iwater + 1
+		iHw = list_Hw[iHw]
+		aux = np.concatenate(( aux, [np.array(aux_entries[list_Hw[iw]][3:]) - np.array(aux_entries[iHw][3:])] ))
+
+
+	dist = check_distance_PBC(aux)
+	if np.any( dist < min_dist_H ):
+		return False
+
+	# Check distance wrt other oxygen atoms
+	aux = np.zeros((0,3),dtype=float)
+	for iO in range(len(list_O)):
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+		aux = np.concatenate(( aux, [np.array(aux_entries[list_O[iO]][3:]) - np.array(aux_entries[iHw][3:])] ))
+
+	for iO in range(len(list_Ow)):
+		if iO == iwater: continue
+
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+		aux = np.concatenate(( aux, [np.array(aux_entries[list_Ow[iO]][3:]) - np.array(aux_entries[iHw][3:])] ))
+
+
+	dist = check_distance_PBC(aux)
+	if np.any( dist < min_dist_O ):
+		return False
+
+	return True
+
+
+def check_distance_PBC(v1_v2):
+	cell = np.array([ [6.7352,    0.0 ,      0.0],
+				 		   [-4.071295, 6.209521,  0.0],
+						   [0.7037701, -6.2095578, 13.9936836] ])
+
+	invcell = np.linalg.inv(cell)
+
+	aux = v1_v2
+
+	aux2 = np.array(np.dot(aux, invcell),dtype=int)
+
+	if np.any( np.abs(aux2) ) >= 1:
+		aux = aux - np.dot(aux2,cell)
+
+
+	return np.linalg.norm(aux,axis=1)
+
+
+
+
+def check_new_molecule_old(iwater, list_Hw, list_Ow, list_oH, list_O, aux_entries, min_dist_H=0.8, min_dist_O=1.0):
 	# Check distance wrt Oh
 	for iH in range(len(list_oH)):
 		iHw = 2*iwater
 		iHw = list_Hw[iHw]
-		dist = np.linalg.norm( np.array(aux_entries[list_oH[iH]][3:]) - np.array(aux_entries[iHw][3:]) )
-		if dist < min_dist:
+		dist = check_distance_PBC_old( np.array(aux_entries[list_oH[iH]][3:]) , np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist_H:
 			return False
 		iHw = 2*iwater + 1
 		iHw = list_Hw[iHw]
-		dist = np.linalg.norm( np.array(aux_entries[list_oH[iH]][3:]) - np.array(aux_entries[iHw][3:]) )
-		if dist < min_dist:
+		dist = check_distance_PBC_old( np.array(aux_entries[list_oH[iH]][3:]) , np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist_H:
 			return False
 
-	# Check distance wrh previous water molecules
+	# Check distance wrt previous water molecules
 	for iw in range(2*(iwater-1)):
 		iHw = 2*iwater
 		iHw = list_Hw[iHw]
-		dist = np.linalg.norm( np.array(aux_entries[list_Hw[iw]][3:]) - np.array(aux_entries[iHw][3:]) )
-		if dist < min_dist:
+		dist = check_distance_PBC_old( np.array(aux_entries[list_Hw[iw]][3:]) , np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist_H:
 			return False
 		iHw = 2*iwater + 1
 		iHw = list_Hw[iHw]
-		dist = np.linalg.norm( np.array(aux_entries[list_Hw[iw]][3:]) - np.array(aux_entries[iHw][3:]) )
-		if dist < min_dist:
+		dist = check_distance_PBC_old( np.array(aux_entries[list_Hw[iw]][3:]) , np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist_H:
 			return False
+
+
+	# Check distance wrt other oxygen atoms
+	for iO in range(len(list_O)):
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+		dist = check_distance_PBC_old( np.array(aux_entries[list_O[iO]][3:])  , np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist_O:
+			return False
+
+	for iO in range(len(list_Ow)):
+		if iO == iwater: continue
+
+		iHw = 2*iwater
+		iHw = list_Hw[iHw]
+		dist = check_distance_PBC_old( np.array(aux_entries[list_Ow[iO]][3:]) , np.array(aux_entries[iHw][3:]) )
+		if dist < min_dist_O:
+			return False
+
 
 	return True
 
+
+def check_distance_PBC_old(v1, v2):
+	cell = np.array([ [6.7352,    0.0 ,      0.0],
+				 		   [-4.071295, 6.209521,  0.0],
+						   [0.7037701, -6.2095578, 13.9936836] ])
+
+	invcell = np.linalg.inv(cell)
+
+	aux = v1-v2
+
+	aux2 = np.array(np.dot(aux, invcell),dtype=int)
+
+	if np.any( np.abs(aux2) ) >= 1:
+		aux = aux - np.dot(aux2,cell)
+
+
+	return np.linalg.norm(aux)
 
 
 
