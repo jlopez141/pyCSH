@@ -67,7 +67,7 @@ random.seed(seed+10)
 
 if create or check:
 	# Get all possible bricks
-	sorted_bricks = get_all_bricks(pieces)
+	bricks, sorted_bricks = get_all_bricks(pieces)
 
 	# for CaSi in sorted_bricks:
 	# 	if 0 in sorted_bricks[CaSi]:
@@ -75,6 +75,11 @@ if create or check:
 	# 			for Ca in sorted_bricks[CaSi][0][Si]:
 	# 				print(CaSi, Si, Ca, len(sorted_bricks[CaSi][0][Si][Ca]))
 	# 	print()
+
+
+#combs = [ b.comb for b in bricks ]
+
+#s = set(tuple(i) for i in combs)
 
 
 if create or read_structure:

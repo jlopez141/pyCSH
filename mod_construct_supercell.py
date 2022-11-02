@@ -400,6 +400,9 @@ def check_move_water_hydrogens(crystal_entries):
 	N_water = len(list_Ow)
 	N_not_ok = 0
 
+	if N_water == 0:
+		return aux_entries, 0, 1
+
 	for itry in range(10):
 		N_not_ok = 0
 		for iwater in range(len(list_Ow)):

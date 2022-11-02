@@ -317,18 +317,20 @@ def interlayer():
 										comb = [i_Ca_1, i_Ca_2, i_Ca_3, i_Ca_4, i_Ca_5,
 										        i_OH_1, i_OH_2, i_OH_3, i_OH_4]
 
-										comb = [x for x in comb if x is not None]
 
-										if i_Ca_2 == "XU":
-											combs_inter.append(comb)
-											comb.append( "oXU" )
-											combs_inter.append(comb)
-										if i_Ca_3 == "XD":
-											combs_inter.append(comb)
-											comb.append( "oXD" )
-											combs_inter.append(comb)
-										else:
-											combs_inter.append(comb)
+										inter_OH_5 = [None]
+										if i_Ca_2 == "XU": inter_OH_5.append("oXU")
+										if i_Ca_3 == "XD": inter_OH_5.append("oXD")
+
+										# if i_Ca_2 == "XU" or i_Ca_3 == "XD":
+										# 	print(inter_OH_5)
+
+										for i_OH_5 in inter_OH_5:
+
+											comb1 = [i for i in comb]
+											comb1.append(i_OH_5)
+											comb1 = [x for x in comb1 if x is not None]
+											combs_inter.append(comb1)
 
 	return combs_inter
 
@@ -368,9 +370,12 @@ def get_all_bricks(pieces):
 
 	sorted_bricks = {}
 
+	bricks = []
+
 	ind = 0
 	for i_comb in combs:
 		b = Brick(i_comb, pieces, ind)
+		bricks.append(b)
 
 		Ca_Si = round( b.N_Ca/b.N_Si, 15 )
 		Q     = b.charge
@@ -380,6 +385,7 @@ def get_all_bricks(pieces):
 
 
 		if abs(Q) < 5:
+
 
 			if Ca_Si in sorted_bricks:
 				if Q in sorted_bricks[Ca_Si]:
@@ -397,7 +403,7 @@ def get_all_bricks(pieces):
 
 		ind += 1
 
-	return sorted_bricks
+	return bricks, sorted_bricks
 
 
 
