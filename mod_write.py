@@ -70,6 +70,7 @@ def get_lammps_input(input_file, entries_crystal, entries_bonds, entries_angle, 
 		fmt = "{: 8d} {: 8d} \n"
 		if write_lammps_erica:
 			f.write( "CS-Info \n" )
+			f.write( "\n" )
 			for i in CS_info:
 				f.write( fmt.format(*i))
 

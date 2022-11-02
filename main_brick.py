@@ -179,7 +179,7 @@ if read_structure:
 
 	entries_angle = get_angles(crystal_dict, water_dict, shape)
 
-	entries_crystal, N_not_ok = check_move_water_hydrogens(entries_crystal)
+	entries_crystal, N_not_ok, itry = check_move_water_hydrogens(entries_crystal)
 
 
 
