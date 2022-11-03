@@ -320,6 +320,7 @@ def get_xyz_input(name, entries_crystal, supercell):
 	#f.write( " \n" )
 	with open( name, "w" ) as f:
 		f.write( "{: 12d} \n".format(np.sum(N_atoms_specie)) )
+		f.write( " \n" )
 		fmt = "{:} {: 12.6f} {: 12.6f} {: 12.6f} \n"
 		
 		# for i in range(8):

@@ -132,8 +132,6 @@ pieces = { "<L"   : Piece( charge = -2, file = "<L"   ),
 		   "oXU"  : Piece( charge = -1, file = "oXU" ),
 		   "oXD"  : Piece( charge = -1, file = "oXD" ),
                                                              
-		   "XU"   : Piece( charge = 2,  file = "XU"  ),
-		   "XD"   : Piece( charge = 2,  file = "XD"  ),
                                                              
 		   "oMDL" : Piece( charge = -1, file = "oMDL"),
 		   "oMDR" : Piece( charge = -1, file = "oMDR"),
@@ -179,7 +177,7 @@ class Brick(object):
 		self.N_SUD = 0
 		self.N_braket = 0
 
-		list_water = set( ["wDR", "wDR", "wIL", "wIR", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR", "w14", "w15", "w16"] )
+		list_water = set( ["wDR", "wIL", "wIR", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR", "w14", "w15", "w16"] )
 
 		#list_water = set( ["wDR", "wDR", "wIL", "wIR2", "wUL", "wXD", "wXU", "wMDL", "wMUL", "wMDR", "wMUR"] )
 
@@ -198,7 +196,7 @@ class Brick(object):
 							"SD"  : ["wMDR", "wDR"],
 							"SDo" : ["wMDR", "wDR"],
 							"SU"  : ["wMUR", "wUL"],
-							"SUo" : ["wMUR", "wUL"],
+							"SUo" : ["wMUR", "wUL", "w16"],
 		}
 
 
@@ -375,7 +373,6 @@ def get_all_bricks(pieces):
 	ind = 0
 	for i_comb in combs:
 		b = Brick(i_comb, pieces, ind)
-		bricks.append(b)
 
 		Ca_Si = round( b.N_Ca/b.N_Si, 15 )
 		Q     = b.charge
@@ -384,7 +381,8 @@ def get_all_bricks(pieces):
 		CaOH = round( (b.N_Oh - b.N_SiOH )/b.N_Ca, 4)
 
 
-		if abs(Q) < 5:
+		if abs(Q) < 3:
+			bricks.append(b)
 
 
 			if Ca_Si in sorted_bricks:

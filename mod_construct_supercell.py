@@ -403,6 +403,9 @@ def check_move_water_hydrogens(crystal_entries):
 	if N_water == 0:
 		return aux_entries, 0, 1
 
+	# Check which water molecules "have the least space around them"
+
+
 	for itry in range(10):
 		N_not_ok = 0
 		for iwater in range(len(list_Ow)):
@@ -412,7 +415,7 @@ def check_move_water_hydrogens(crystal_entries):
 			for i in range(100):
 				#print(iwater, i)
 				ok_molecule = check_new_molecule(iwater, list_Hw, list_Ow, list_oH, list_O, aux_entries,
-					                             min_dist_H=0.8, min_dist_O=0.7)
+					                             min_dist_H=0.8, min_dist_O=1.0)
 				if ok_molecule:
 					ok_struc = True
 					break
@@ -497,6 +500,10 @@ def new_molecule_coordinates(iwater, list_Hw, list_Ow, aux_entries):
 	aux_entries[iHw1][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + r_H1
 	aux_entries[iHw2][3:] = np.array(aux_entries[list_Ow[iwater]][3:]) + r_H2
 
+
+
+def list_distance_Ow(list_Hw, list_Ow, list_oH, list_O, aux_entries, min_dist_H=0.8, min_dist_O=1.0):
+	N_water = len(list_Ow)
 
 
 
