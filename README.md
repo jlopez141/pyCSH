@@ -2,7 +2,11 @@
 
 **pyCSH** is a  Python code for the automated generation of realistic bulk calcium silicate hydrate (C-S-H) structures, based on the brick model introduced by Kunhi Mohamed et al [1].
 
-[1] A. Kunhi Mohamed, S.C. Parker, P. Bowen, S. Galmarini. An atomistic building block description of C-S-H -  Towards a realistic C-S-H model, Cem Concr Res 107 (2018) 221–235. https://doi.org/10.1016/j.cemconres.2018.01.007.
+[1] A. Kunhi Mohamed, S.C. Parker, P. Bowen, S. Galmarini. An atomistic building block description of C-S-H - Towards a realistic C-S-H model, Cement and Concrete Research 107 (2018) 221–235. https://doi.org/10.1016/j.cemconres.2018.01.007.
+
+If you use this code, please cite the following article:
+
+Ziga Casar, Jon López-Zorrilla, Hegoi Manzano, Eduardo Duque-Redondo, Aslam Kunhi Mohamed, Karen Scrivener, Paul Bowen. pyCSH: Automated atomic-level structure generation of bulk C-S-H and investigation of their intrinsic properties. Cement and Concrete Research 183 (2024). https://doi.org/10.1016/j.cemconres.2024.107593
 
 # License
  
